@@ -1,0 +1,88 @@
+CONTEXT — JAVIER MONEDERO ANGULO (knowledge base for the portfolio assistant, Oct 2026)
+
+=== WHO I AM ===
+I am Javier Monedero Angulo, based in Madrid, Spain. I am a third-year (penultimate year)
+student of the BSc in Information Systems Engineering at Universidad Politécnica de Madrid
+(ETSISI-UPM), started September 2024, expected graduation June 2028. My career goal is to
+become a cloud Solutions Architect: I prefer designing architectures and making technical
+decisions over full-time coding, and I enjoy the mix of technical depth and communication
+that the role requires. I am currently applying to the AWS Associate Solutions Architect
+Internship 2027 (Madrid), with availability for the 3-month summer cohort (July–September
+2027; my university finals run through late June).
+
+=== EDUCATION ===
+BSc in Information Systems Engineering, UPM (ETSISI), Madrid — Sept 2024 to June 2028
+(expected). Relevant coursework through 3rd year: Java across six courses (fundamentals,
+workshop, data structures, object-oriented programming, concurrent & advanced programming,
+software engineering fundamentals), databases (relational and NoSQL), operating systems,
+computer networks, and classical AI (decision trees, heuristic search such as A*, shallow
+neural networks).
+
+=== CERTIFICATION ===
+AWS Certified Solutions Architect – Associate (SAA-C03): in progress, studying daily,
+target exam December 2026.
+
+=== PROJECT 1 — AUTONOMOUS GENAI EMAIL CLASSIFICATION & ROUTING ENGINE ===
+Public repo: github.com/JavierMonederoAngulo/n8n-ai-email-orchestrator
+A fault-tolerant, event-driven pipeline I designed and built: self-hosted n8n running in
+Docker on Ubuntu Server, integrating Microsoft Graph API (Outlook) and Google Gemini
+(gemini-flash-lite). Key facts:
+- Classifies and routes 2,000+ legacy emails in batches plus real-time incoming messages.
+- Orchestrator-Worker architecture: a parent workflow controls pagination in batches of 50;
+  a stateless worker sub-workflow does classification and routing. The decoupling prevents
+  Node.js V8 memory leaks caused by long-running loops.
+- N-to-1 aggregation: a JavaScript normalization layer consolidates each 50-email batch into
+  a single structured JSON payload, so a batch needs only ONE LLM inference call — a 98%
+  reduction in API requests versus per-email calls — averaging ~2.4 seconds per email.
+- 3-tier fault tolerance: automatic retries for transient HTTP 502/503 failures, item-level
+  poison-pill isolation via a local dead-letter log, and an out-of-band catastrophic error
+  handler designed to avoid circular dependencies (e.g., it never depends on the service
+  whose credentials expired).
+- All major design decisions are documented as Architecture Decision Records (ADRs) in the
+  repository README.
+
+=== PROJECT 2 — THIS WEBSITE (SERVERLESS CLOUD PORTFOLIO ON AWS) ===
+The site you are using right now. Architecture:
+- Static frontend on Amazon S3 with public access blocked, delivered globally over HTTPS via
+  Amazon CloudFront with Origin Access Control (OAC).
+- Visitor counter: Amazon API Gateway (HTTP API, throttling) → AWS Lambda (Python, boto3) →
+  Amazon DynamoDB atomic counter, under strict IAM least-privilege policies.
+- This "Ask my CV" assistant: AWS Lambda calling Amazon Bedrock with my CV context injected
+  from S3 (in-context knowledge). I deliberately did NOT build a RAG/vector index because
+  the corpus fits entirely in the prompt window; I would move to Amazon Knowledge Bases if
+  the document set grew.
+- CI/CD: GitHub Actions deploys on every push using OIDC — no long-lived AWS credentials.
+- Cost awareness: billing alarms configured; everything runs within AWS Free Tier limits.
+
+=== PROJECT 3 — SELF-HOSTED REMOTE GAMING HOMELAB ===
+Running 24/7 for real users (my family): a Raspberry Pi with Ubuntu Server as an always-on
+home node, Tailscale (mesh VPN) for secure remote access, Wake-on-LAN to power on the gaming
+PC on demand, and a low-latency game-streaming server/client setup. I researched, integrated
+and configured the entire stack myself.
+
+=== SKILLS ===
+- Programming: Java is my main language (six university courses — OOP, concurrency, data
+  structures). Python: basic, practical level — I have written and deployed AWS Lambda
+  functions in Python with boto3 (built with AI assistance). JavaScript: only inside n8n
+  Code nodes, adapted with AI assistance. SQL: formal university coursework, currently
+  deepening it through the advanced databases course.
+- Cloud & AWS: S3, CloudFront (CDN, OAC), Lambda, DynamoDB, API Gateway, IAM, GitHub Actions
+  with OIDC; currently preparing the AWS Solutions Architect – Associate certification.
+- Systems: Linux (Ubuntu Server administration, home lab), Docker, Git/GitHub, REST APIs,
+  OAuth2.
+- Generative AI: LLM API integration (Google Gemini batch inference; Amazon Bedrock), prompt
+  engineering for structured JSON outputs, n8n agentic workflows, daily user of AI coding
+  assistants.
+=== LANGUAGES ===
+Spanish: native. English: measured with EF SET in October 2026 — overall 60/100 (B2 high);
+listening 67 (C1) and reading 63 (C1) are my strongest skills and I work with technical
+documentation in English every day; my speaking is in active daily training for interviews.
+
+=== BEYOND TECH ===
+I enjoy teaching and mentoring: I have taught programming, study techniques and training
+routines to my younger siblings, and helped them build their own PCs.
+
+=== CONTACT ===
+Email: javier.monedero@outlook.com
+LinkedIn: linkedin.com/in/javier-monedero-angulo-798248445
+GitHub: github.com/JavierMonederoAngulo

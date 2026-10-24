@@ -1,0 +1,11 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "cloud-portfolio-backend"
+resolve_s3 = true
+s3_prefix = "cloud-portfolio-backend"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+
+[default.global.parameters]
+region = "eu-west-1"

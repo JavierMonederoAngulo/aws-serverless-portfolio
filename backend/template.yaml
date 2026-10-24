@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Backend Serverless para Cloud Portfolio (DynamoDB + Lambda + HTTP API)
+
+Resources:
+  # 1. Base de datos NoSQL Serverless
+  VisitorTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: portfolio-visitor-counter
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  # 2. API Gateway (HTTP API v2) con CORS restringido
+  PortfolioHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "https://d3vjauql06bl7n.cloudfront.net"
+        AllowMethods:
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+
+  # 3. Función Lambda + Rol IAM de Mínimo Privilegio Estricto
+  VisitorCounterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - arm64
+      MemorySize: 128
+      Timeout: 5
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref VisitorTable
+          ALLOWED_ORIGIN: "https://d3vjauql06bl7n.cloudfront.net"
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:UpdateItem
+              Resource: !GetAtt VisitorTable.Arn
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortfolioHttpApi
+            Path: /visit
+            Method: POST
+
+  # 4. Función Lambda para el Chat de Bedrock (con CV local y Concurrencia Limitada)
+  AskCvFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: chat.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 15
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: "https://d3vjauql06bl7n.cloudfront.net"
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource:
+                - "arn:aws:bedrock:eu-west-1:426714791002:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+                - "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0"
+            - Effect: Allow
+              Action:
+                - aws-marketplace:ViewSubscriptions
+                - aws-marketplace:Subscribe
+              Resource: "*"
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortfolioHttpApi
+            Path: /chat
+            Method: POST
+
+Outputs:
+  ApiEndpoint:
+    Description: URL del endpoint de API Gateway para el frontend
+    Value: !Sub "https://${PortfolioHttpApi}.execute-api.${AWS::Region}.amazonaws.com/visit"
