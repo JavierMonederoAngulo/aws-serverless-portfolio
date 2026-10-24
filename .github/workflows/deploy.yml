@@ -45,5 +45,5 @@ jobs:
       - name: Invalidate CloudFront Cache
         run: |
           # Obtenemos el ID de la distribución buscando por el bucket de origen
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='cloud-portfolio-426714791002-eu-west-1-an .s3.eu-west-1.amazonaws.com'].Id" --output text)
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='cloud-portfolio-426714791002-eu-west-1-an.s3.eu-west-1.amazonaws.com'].Id" --output text)
           aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
