@@ -1,0 +1,49 @@
+name: Deploy AWS Portfolio
+
+on: [push]
+
+# Permiso necesario para que GitHub solicite el token OIDC a AWS
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::426714791002:role/GitHubActionsDeployRole
+          role-session-name: GitHubActionsSession
+
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: SAM Build & Deploy Backend
+        working-directory: ./backend
+        run: |
+          sam build
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+
+      - name: Sync Frontend to S3
+        working-directory: ./frontend
+        run: |
+          aws s3 sync . s3://cloud-portfolio-426714791002-eu-west-1-an  --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          # Obtenemos el ID de la distribución buscando por el bucket de origen
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='cloud-portfolio-426714791002-eu-west-1-an .s3.eu-west-1.amazonaws.com'].Id" --output text)
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
