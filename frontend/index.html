@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Javier Monedero Angulo — Cloud Portfolio</title>
-    <meta name="description" content="Portfolio of Javier Monedero Angulo — Information Systems Engineering student (UPM) and future Solutions Architect. Serverless on AWS, with an interactive 'Ask my CV' assistant powered by Amazon Bedrock.">
+    <meta name="description" content="Portfolio of Javier Monedero Angulo — Information Systems Engineering student (UPM) and aspiring Solutions Architect. Serverless on AWS, with an interactive 'Ask my CV' assistant powered by Amazon Bedrock.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,7 +52,7 @@
         .nav-inner { max-width: 980px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
         .logo { font-weight: 800; font-size: 15px; letter-spacing: .3px; }
         .logo span { color: var(--accent); }
-        .nav-links { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav-links { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
         .nav-links a {
             color: var(--muted); text-decoration: none; font-size: 13.5px; font-weight: 500;
             padding: 6px 10px; border-radius: 8px; transition: .2s;
@@ -83,6 +83,16 @@
             padding: 6px 12px; border-radius: 999px;
         }
         .badge b { color: var(--text); font-weight: 600; }
+        .badge.visitor-badge {
+            border-color: rgba(62, 207, 142, 0.4);
+            background: rgba(62, 207, 142, 0.08);
+            color: #c6cfd9;
+            font-family: var(--mono);
+        }
+        .badge.visitor-badge b {
+            color: var(--green);
+            font-weight: 700;
+        }
         .cta-row { margin-top: 34px; display: flex; gap: 12px; flex-wrap: wrap; }
         .btn {
             display: inline-flex; align-items: center; gap: 8px;
@@ -225,8 +235,13 @@
             padding: 8px 14px; border-radius: 9px; transition: .2s;
         }
         .foot-links a:hover { border-color: rgba(255,153,0,.45); }
-        .foot-meta { margin-top: 30px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-family: var(--mono); font-size: 11.5px; color: #5c6773; }
-        #counter { color: var(--green); font-weight: 600; }
+        .foot-meta {
+            margin-top: 30px; padding: 14px 18px;
+            background: rgba(255,255,255,.025); border: 1px solid var(--panel-border); border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;
+            font-family: var(--mono); font-size: 12px; color: var(--muted);
+        }
+        #counter, #hero-counter { color: var(--green); font-weight: 700; }
 
         /* ---------- Reveal ---------- */
         .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
@@ -240,7 +255,7 @@
             .stage { grid-template-columns: 1fr; }
             .stage .desc { margin-top: 2px; }
             .metrics { gap: 18px; }
-            .foot-meta { flex-direction: column; gap: 6px; }
+            .foot-meta { flex-direction: column; align-items: flex-start; gap: 6px; }
         }
     </style>
 </head>
@@ -263,16 +278,16 @@
 <header class="hero">
     <div class="wrap">
         <div class="kicker"><span class="dot"></span> OPEN TO SOLUTIONS ARCHITECT INTERNSHIPS · JUL–SEP 2027</div>
-        <h1>Hi, I'm Javier.<br>I design <span class="grad">cloud &amp; GenAI systems</span> that ship.</h1>
+        <h1>Hi, I'm Javier.<br>Aspiring <span class="grad">Solutions Architect</span> &amp; Cloud Builder.</h1>
         <p class="hero-sub">
-            Information Systems Engineering student at <strong>UPM (Madrid)</strong> on the
-            <strong>Solutions Architect</strong> path. I build real, running systems — an autonomous
-            email engine with batch LLM inference, this fully serverless portfolio on AWS, and a 24/7
-            self-hosted homelab.
+            Information Systems Engineering student at <strong>UPM (Madrid)</strong> focused on
+            <strong>Cloud Architecture</strong> and <strong>AI/ML</strong>. I learn by designing and deploying real systems — an automated
+            email classification pipeline with batch LLM inference, this serverless portfolio on AWS, and a home network lab.
         </p>
         <div class="badges">
+            <div class="badge visitor-badge">⚡ Live visitor <b id="hero-counter">#…</b> · DynamoDB</div>
             <div class="badge">🎓 <b>3rd year</b> · Class of 2028</div>
-            <div class="badge">📚 <b>AWS SAA</b> in progress · exam Dec 2026</div>
+            <div class="badge">📚 <b>AWS SAA-C03</b> in progress · Dec 2026</div>
             <div class="badge">📍 Madrid, Spain</div>
         </div>
         <div class="cta-row">
@@ -287,32 +302,30 @@
     <div class="wrap">
         <div class="sec-head">
             <div class="sec-tag">// about</div>
-            <h2>Architect first, builder always.</h2>
+            <h2>System design first, hands-on building always.</h2>
         </div>
         <div class="about-grid">
             <div class="card reveal">
                 <p>
                     I'm a third-year <strong>BSc Information Systems Engineering</strong> student at
-                    <strong>Universidad Politécnica de Madrid (ETSISI)</strong>, and I've chosen the
-                    Solutions Architect path deliberately: what I enjoy most is designing how systems
-                    fit together — then building them myself to prove the design works.
+                    <strong>Universidad Politécnica de Madrid (ETSISI)</strong>, pursuing a career as a
+                    <strong>Solutions Architect</strong>. What motivates me most is understanding how distributed pieces fit together
+                    and turning architectural diagrams into working systems.
                 </p>
                 <p>
-                    My work combines three things I care about: <strong>cloud architecture on AWS</strong>
-                    (currently preparing the <strong>AWS Solutions Architect – Associate</strong>
-                    certification, exam December 2026), <strong>generative AI applied to real problems</strong>
-                    (LLM APIs, batch inference, agentic workflows), and <strong>systems thinking</strong>
-                    — every project on this page is running in production for real users, including me.
+                    Currently, I am preparing for the <strong>AWS Certified Solutions Architect – Associate (SAA-C03)</strong> exam (December 2026)
+                    while exploring practical applications of <strong>Generative AI</strong>. Long-term, my goal is to specialize at the intersection of
+                    <strong>Cloud Architecture and Machine Learning</strong>.
                 </p>
             </div>
             <div class="card facts reveal">
                 <div class="fact"><span>Degree</span><b>Information Systems Eng. · UPM</b></div>
                 <div class="fact"><span>Graduation</span><b>June 2028</b></div>
-                <div class="fact"><span>Main language</span><b>Java (6 courses)</b></div>
-                <div class="fact"><span>Cloud focus</span><b>AWS · SAA in progress</b></div>
-                <div class="fact"><span>AI focus</span><b>LLM APIs · Bedrock · n8n agents</b></div>
-                <div class="fact"><span>Availability</span><b>Jul – Sep 2027 · full-time</b></div>
-                <div class="fact"><span>Languages</span><b>Spanish (native) · English (C1 listening/reading)</b></div>
+                <div class="fact"><span>Core language</span><b>Java (Academic foundation)</b></div>
+                <div class="fact"><span>Cloud focus</span><b>AWS · SAA-C03 in progress</b></div>
+                <div class="fact"><span>Career goal</span><b>Cloud &amp; AI/ML Solutions Architect</b></div>
+                <div class="fact"><span>Availability</span><b>Jul – Sep 2027 · Internship</b></div>
+                <div class="fact"><span>Languages</span><b>Spanish · English</b></div>
             </div>
         </div>
     </div>
@@ -322,8 +335,8 @@
     <div class="wrap">
         <div class="sec-head">
             <div class="sec-tag">// projects</div>
-            <h2>Three systems. All running. All mine.</h2>
-            <p>Not coursework — self-initiated, self-built, documented like production systems.</p>
+            <h2>Three systems. All running.</h2>
+            <p>Self-initiated projects built to solve real personal needs and learn cloud &amp; distributed patterns hands-on.</p>
         </div>
         <div class="projects-grid">
 
@@ -331,62 +344,63 @@
                 <div class="project-top">
                     <div>
                         <h3>🤖 Autonomous GenAI Email Classification &amp; Routing Engine</h3>
-                        <div class="this-note">Self-hosted · running in production for my own inbox</div>
+                        <div class="this-note">Self-hosted · tested &amp; running on my own Outlook inbox</div>
                     </div>
                     <a class="repo-link" href="https://github.com/JavierMonederoAngulo/n8n-ai-email-orchestrator" target="_blank" rel="noopener">View repo ↗</a>
                 </div>
                 <div class="chips">
                     <span class="chip">n8n (Docker)</span><span class="chip">Ubuntu Server</span>
-                    <span class="chip">Google Gemini API</span><span class="chip">Microsoft Graph API</span><span class="chip">JavaScript</span>
+                    <span class="chip">Gemini Flash-Lite</span><span class="chip">Microsoft Graph API</span><span class="chip">JavaScript (ES6)</span>
                 </div>
                 <div class="metrics">
-                    <div class="metric"><b>2,000+</b><span>emails classified &amp; routed</span></div>
-                    <div class="metric"><b>−98%</b><span>LLM API calls via batch aggregation</span></div>
-                    <div class="metric"><b>~2.4 s</b><span>per email, end to end</span></div>
-                    <div class="metric"><b>4</b><span>Architecture Decision Records</span></div>
+                    <div class="metric"><b>2,000+</b><span>legacy emails processed in initial run</span></div>
+                    <div class="metric"><b>−98%</b><span>LLM API calls (50-to-1 batching)</span></div>
+                    <div class="metric"><b>~2.4 s</b><span>avg per email (incl. 1s rate-limit delay)</span></div>
+                    <div class="metric"><b>4</b><span>Architecture Decision Records (ADRs)</span></div>
                 </div>
                 <ul>
-                    <li><strong>Orchestrator-Worker architecture</strong> — decoupled pagination from processing to avoid Node.js V8 memory leaks in long loops.</li>
-                    <li><strong>N-to-1 aggregation</strong> — a custom JS layer packs each 50-email batch into one structured payload, so a batch needs a single Gemini inference call instead of 50.</li>
-                    <li><strong>3-tier fault tolerance</strong> — transient-failure retries, item-level poison-pill isolation with a local dead-letter log, and an out-of-band catastrophic handler with zero circular dependencies.</li>
-                    <li>Every decision documented as <strong>ADRs</strong> in the repo README, including how each part maps to native AWS services (Step Functions, Lambda, SQS, Bedrock).</li>
+                    <li><strong>Orchestrator-Worker decoupling (ADR 01)</strong> — separated pagination state from batch execution so child sub-workflows release memory after each batch, avoiding Node.js V8 heap crashes.</li>
+                    <li><strong>N-to-1 payload aggregation (ADR 02)</strong> — consolidates 50 emails into a single structured JSON prompt per batch, cutting 50 individual LLM calls down to 1 and respecting Gemini RPM quotas.</li>
+                    <li><strong>Dual-ingestion &amp; stateless runtime (ADR 03 &amp; 04)</strong> — a unified worker handles both bulk legacy batches and single real-time Outlook triggers, dynamically mapping Graph Folder IDs at runtime without fragile global cache state.</li>
+                    <li><strong>3-tier fault tolerance</strong> — automatic retries on transient HTTP failures, item-level poison-pill isolation to a local Dead-Letter file (<code>/tmp/n8n_errores_correos.txt</code>), and an out-of-band catastrophic error logger avoiding circular email alerts.</li>
                 </ul>
             </article>
 
             <article class="project reveal">
                 <div class="project-top">
                     <div>
-                        <h3>☁️ This website — Serverless Cloud Portfolio on AWS</h3>
-                        <div class="this-note">✦ Yes — the page you are reading right now is the project</div>
+                        <h3>☁️ This Website — Serverless Cloud Portfolio on AWS</h3>
+                        <div class="this-note">✦ The page you are browsing right now</div>
                     </div>
+                    <a class="repo-link" href="https://github.com/JavierMonederoAngulo/aws-serverless-portfolio" target="_blank" rel="noopener">View repo ↗</a>
                 </div>
                 <div class="chips">
-                    <span class="chip">S3 + OAC</span><span class="chip">CloudFront</span><span class="chip">Lambda (Python)</span>
-                    <span class="chip">DynamoDB</span><span class="chip">API Gateway</span><span class="chip">Amazon Bedrock</span><span class="chip">GitHub Actions + OIDC</span>
+                    <span class="chip">S3 + OAC</span><span class="chip">CloudFront</span><span class="chip">API Gateway</span>
+                    <span class="chip">Lambda (Python)</span><span class="chip">DynamoDB</span><span class="chip">Amazon Bedrock (Claude Haiku)</span><span class="chip">AWS SAM</span><span class="chip">GitHub Actions + OIDC</span>
                 </div>
                 <ul>
-                    <li><strong>Private edge delivery</strong> — S3 with all public access blocked, served globally over HTTPS through CloudFront with Origin Access Control.</li>
-                    <li><strong>Live visitor counter</strong> — API Gateway (throttled) → Lambda → DynamoDB atomic counter, under strict least-privilege IAM.</li>
-                    <li><strong>"Ask my CV" assistant</strong> — a Lambda-powered chat backed by <strong>Amazon Bedrock</strong>, with my CV injected as context from S3. Try it below — recruiters welcome.</li>
-                    <li><strong>CI/CD without secrets</strong> — GitHub Actions deploys on every push using OIDC; no long-lived AWS credentials anywhere. Billing alarms on, Free Tier respected.</li>
+                    <li><strong>Private edge delivery</strong> — S3 bucket with all public access blocked, served globally over HTTPS via CloudFront using Origin Access Control (OAC).</li>
+                    <li><strong>Serverless visitor counter</strong> — API Gateway routes requests to a Python Lambda function that performs atomic updates on a DynamoDB table under strict least-privilege IAM roles.</li>
+                    <li><strong>"Ask my CV" AI assistant</strong> — powered by <strong>Amazon Bedrock</strong> using the EU cross-region inference profile (<code>eu.anthropic.claude-haiku-4-5</code>) for GDPR data residency, grounded with my CV context.</li>
+                    <li><strong>Zero-secret CI/CD pipeline</strong> — automated deployments via AWS SAM and GitHub Actions using <strong>OpenID Connect (OIDC)</strong> temporary role assumption, with zero static AWS access keys stored in GitHub.</li>
                 </ul>
             </article>
 
             <article class="project reveal">
                 <div class="project-top">
                     <div>
-                        <h3>🎮 Self-hosted Remote Gaming Homelab</h3>
-                        <div class="this-note">Running 24/7 · real users (my family)</div>
+                        <h3>🎮 Self-Hosted Home Lab &amp; Remote Gaming Setup</h3>
+                        <div class="this-note">Personal lab · used by my brothers and me when away from home</div>
                     </div>
                 </div>
                 <div class="chips">
-                    <span class="chip">Raspberry Pi</span><span class="chip">Ubuntu Server</span>
-                    <span class="chip">Tailscale (mesh VPN)</span><span class="chip">Wake-on-LAN</span><span class="chip">Game streaming</span>
+                    <span class="chip">Raspberry Pi &amp; ThinkPad</span><span class="chip">Ubuntu Server</span>
+                    <span class="chip">Docker</span><span class="chip">Tailscale VPN</span><span class="chip">Wake-on-LAN</span><span class="chip">Sunshine / Moonlight</span>
                 </div>
                 <ul>
-                    <li>An always-on Raspberry Pi node with <strong>Ubuntu Server</strong>, reachable from anywhere through a <strong>Tailscale mesh VPN</strong>.</li>
-                    <li><strong>Wake-on-LAN</strong> powers the gaming PC on demand — low-latency game streaming from the living room to anywhere with internet.</li>
-                    <li>Researched, integrated and configured the full stack myself; it has been quietly serving my family for years.</li>
+                    <li><strong>Always-on Linux entry node</strong> — a low-power Raspberry Pi running 24/7 at home, connected via <strong>Tailscale</strong> (a point-to-point WireGuard VPN) so we can securely reach our home network from anywhere without opening router ports.</li>
+                    <li><strong>On-demand remote gaming</strong> — configured <strong>Wake-on-LAN</strong> to power on our main desktop PC remotely only when needed, streaming games via Sunshine/Moonlight when my brothers and I travel.</li>
+                    <li><strong>Self-hosted services</strong> — runs Docker containers (including n8n and local media/automation tools) to practice Linux administration and container deployment hands-on.</li>
                 </ul>
             </article>
 
@@ -399,38 +413,34 @@
         <div class="sec-head">
             <div class="sec-tag">// architecture</div>
             <h2>How this page reaches you.</h2>
-            <p>A website that documents its own architecture — the most Solutions-Architect thing it can do.</p>
+            <p>Deployed in <code>eu-west-1</code> (Ireland) using Infrastructure as Code (AWS SAM) and serverless building blocks.</p>
         </div>
         <div class="arch-flow reveal">
             <div class="stage">
-                <div class="name">🌐 Your browser</div>
-                <div class="desc">Requests this page and talks to the API — nothing else.</div>
+                <div class="name">🌐 Your Browser</div>
+                <div class="desc">Loads the static frontend over HTTPS and sends asynchronous POST requests to the backend API.</div>
             </div>
-            <div class="arrow">▼ &nbsp; HTTPS</div>
+            <div class="arrow">▼ &nbsp; HTTPS (Edge Static Delivery)</div>
             <div class="stage">
-                <div class="name">⚡ CloudFront</div>
-                <div class="desc">Global CDN with HTTPS. Origin Access Control — the only door into S3.</div>
-            </div>
-            <div class="stage">
-                <div class="name">🪣 S3</div>
-                <div class="desc">Static site + my CV document, stored with all public access blocked.</div>
+                <div class="name">⚡ CloudFront + 🪣 S3</div>
+                <div class="desc">Global CDN caching static HTML/CSS/JS. S3 blocks all public access; only CloudFront can read files via Origin Access Control (OAC).</div>
             </div>
             <div class="arrow">▼ &nbsp; POST /visit &nbsp;·&nbsp; POST /chat</div>
             <div class="stage">
                 <div class="name">🚪 API Gateway</div>
-                <div class="desc">HTTP API with throttling — the single, guarded entry to the backend.</div>
+                <div class="desc">HTTP API endpoint with CORS configured, acting as the front door to the serverless compute layer.</div>
             </div>
             <div class="stage">
-                <div class="name">λ Lambda</div>
-                <div class="desc">Python + boto3. Two jobs: atomic visitor counter · "Ask my CV" orchestrator.</div>
+                <div class="name">λ AWS Lambda</div>
+                <div class="desc">Python 3.12 functions (<code>boto3</code>) handling atomic counter increments and orchestrating Bedrock LLM prompts.</div>
             </div>
-            <div class="arrow">▼ &nbsp; reads / writes</div>
+            <div class="arrow">▼ &nbsp; AWS SDK (boto3)</div>
             <div class="stage">
                 <div class="name">📊 DynamoDB &nbsp;·&nbsp; 🧠 Bedrock</div>
-                <div class="desc">Counter state with atomic updates &nbsp;·&nbsp; the LLM that answers your questions, with my CV as in-context knowledge from S3.</div>
+                <div class="desc">DynamoDB stores the live visitor count &nbsp;·&nbsp; Amazon Bedrock (<code>eu.</code> profile) processes CV questions strictly within EU regions.</div>
             </div>
         </div>
-        <p class="arch-note">deployed via GitHub Actions + OIDC — no long-lived credentials · billing alarms on · AWS Free Tier</p>
+        <p class="arch-note">CI/CD via GitHub Actions + AWS IAM OIDC · Infrastructure defined in AWS SAM · Cost-controlled within Free Tier</p>
     </div>
 </section>
 
@@ -438,38 +448,45 @@
     <div class="wrap">
         <div class="sec-head">
             <div class="sec-tag">// skills</div>
-            <h2>Honest levels. No padding.</h2>
+            <h2>Technical stack &amp; current level.</h2>
+            <p>A transparent breakdown of what I study academically, what I build on AWS, and how I leverage AI tools to ship projects.</p>
         </div>
         <div class="skill-group reveal">
-            <h4>Programming</h4>
+            <h4>Core Academic Foundations (UPM)</h4>
             <div class="skills">
-                <span class="skill hot">Java — main language</span>
-                <span class="skill">Python (boto3 · Lambda)</span>
-                <span class="skill">SQL</span>
-                <span class="skill">JavaScript (n8n Code nodes)</span>
+                <span class="skill hot">Java — Primary programming language</span>
+                <span class="skill">SQL &amp; Relational Databases</span>
+                <span class="skill">BPMN &amp; Information Systems Modeling</span>
             </div>
         </div>
         <div class="skill-group reveal">
-            <h4>Cloud &amp; AWS</h4>
+            <h4>Cloud Architecture (AWS — Hands-on &amp; Studying SAA-C03)</h4>
             <div class="skills">
-                <span class="skill">S3</span><span class="skill">CloudFront (CDN · OAC)</span><span class="skill">Lambda</span>
-                <span class="skill">DynamoDB</span><span class="skill">API Gateway</span><span class="skill">IAM</span>
-                <span class="skill">GitHub Actions + OIDC</span><span class="skill hot">SAA cert — in progress (Dec 2026)</span>
+                <span class="skill hot">SAA-C03 Prep (Exam Dec 2026)</span>
+                <span class="skill">S3 &amp; CloudFront (OAC)</span>
+                <span class="skill">Lambda &amp; API Gateway</span>
+                <span class="skill">DynamoDB</span>
+                <span class="skill">IAM &amp; OIDC Federation</span>
+                <span class="skill">Amazon Bedrock</span>
+                <span class="skill">AWS SAM (IaC basics)</span>
             </div>
         </div>
         <div class="skill-group reveal">
-            <h4>Systems &amp; Infra</h4>
+            <h4>AI-Assisted Scripting &amp; Workflow Automation</h4>
             <div class="skills">
-                <span class="skill">Linux (Ubuntu Server)</span><span class="skill">Docker</span><span class="skill">Git / GitHub</span>
-                <span class="skill">REST APIs</span><span class="skill">OAuth2</span><span class="skill">Networking (VPN · WoL)</span>
+                <span class="skill hot">n8n (Orchestrator-Worker &amp; Batching)</span>
+                <span class="skill">LLM API Integration (Bedrock · Gemini)</span>
+                <span class="skill">Python &amp; JS (Code reading &amp; AI-assisted scripting)</span>
+                <span class="skill">Structured JSON Prompting</span>
             </div>
         </div>
         <div class="skill-group reveal">
-            <h4>Generative AI</h4>
+            <h4>Practical Systems &amp; Self-Hosting</h4>
             <div class="skills">
-                <span class="skill hot">LLM API integration</span><span class="skill">Amazon Bedrock</span>
-                <span class="skill">Gemini batch inference</span><span class="skill">Prompt engineering (structured JSON)</span>
-                <span class="skill">n8n agentic workflows</span><span class="skill">AI coding assistants — daily</span>
+                <span class="skill">Linux (Ubuntu Server)</span>
+                <span class="skill">Docker (Practical container management)</span>
+                <span class="skill">Git &amp; GitHub Actions</span>
+                <span class="skill">Tailscale VPN &amp; Wake-on-LAN</span>
             </div>
         </div>
     </div>
@@ -479,13 +496,13 @@
     <div class="wrap">
         <div class="sec-head">
             <div class="sec-tag">// ask my cv</div>
-            <h2>Don't read the CV. Ask it.</h2>
-            <p>A live assistant backed by Amazon Bedrock with my CV as context — deployed on this very stack.</p>
+            <h2>Don't just read the CV. Ask it.</h2>
+            <p>A live assistant backed by Amazon Bedrock (Claude Haiku 4.5 EU profile) with my CV injected as context.</p>
         </div>
         <div class="chat-shell reveal">
-            <div class="chat-head">💬 Ask my CV <span class="pill">powered by Amazon Bedrock</span></div>
+            <div class="chat-head">💬 Ask my CV <span class="pill">powered by Amazon Bedrock (EU)</span></div>
             <div id="chat-messages">
-                <div class="msg bot">Hi! I'm Javier's portfolio assistant — I know his studies, projects, skills and availability. Ask me anything about him.</div>
+                <div class="msg bot">Hi! I'm Javier's portfolio assistant — I know his studies at UPM, his projects, his technical skills, and his internship availability. Ask me anything about him!</div>
             </div>
             <div class="suggestions">
                 <button class="suggestion" onclick="sendSuggestion('What projects has Javier built?')">What projects has he built?</button>
@@ -505,7 +522,7 @@
         <div class="foot-grid">
             <div class="foot-left">
                 <div class="logo">javier<span>.monedero</span></div>
-                <p>Available for a full-time 3-month internship · July–September 2027 · Madrid, Spain.</p>
+                <p>Available for a full-time Solutions Architect internship · Summer 2027 · Madrid, Spain.</p>
             </div>
             <div class="foot-links">
                 <a href="mailto:javier.monedero@outlook.com">✉️ Email</a>
@@ -514,14 +531,14 @@
             </div>
         </div>
         <div class="foot-meta">
-            <span>You are visitor <span id="counter">…</span> — counted live by Lambda + DynamoDB ☁️</span>
-            <span>static · serverless · deployed via GitHub Actions (OIDC) · no long-lived credentials</span>
+            <span>⚡ You are visitor <span id="counter">#…</span> — counted live by AWS Lambda + DynamoDB</span>
+            <span>serverless · eu-west-1 · deployed via GitHub Actions (OIDC)</span>
         </div>
     </div>
 </footer>
 
 <script>
-    // ====== API wiring (preserved exactly from the working version) ======
+    // ====== API wiring (preserved from your working backend) ======
     const API_BASE = "https://1ykpc6crlc.execute-api.eu-west-1.amazonaws.com";
 
     // ====== Utilities: escape + tiny Markdown renderer for bot replies ======
@@ -561,16 +578,19 @@
             const response = await fetch(`${API_BASE}/visit`, { method: "POST" });
             if (response.ok) {
                 const data = await response.json();
-                document.getElementById("counter").innerText = "#" + data.visits;
+                const text = "#" + data.visits;
+                document.getElementById("counter").innerText = text;
+                const heroCounter = document.getElementById("hero-counter");
+                if (heroCounter) heroCounter.innerText = text;
             }
         } catch (error) {
             document.getElementById("counter").innerText = "N/A";
+            const heroCounter = document.getElementById("hero-counter");
+            if (heroCounter) heroCounter.innerText = "N/A";
         }
     }
 
     // ====== Chat with Bedrock (POST /chat, {question} => {reply}) ======
-    // NOTE: no Content-Type header on purpose — keeps this a CORS "simple request"
-    // (matches the API Gateway CORS configuration already deployed).
     async function askBedrock() {
         const inputField = document.getElementById("chat-input");
         const sendBtn = document.getElementById("send-btn");
