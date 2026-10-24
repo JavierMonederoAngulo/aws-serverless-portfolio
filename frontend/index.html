@@ -1,89 +1,638 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Portfolio Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javier Monedero Angulo — Cloud Portfolio</title>
+    <meta name="description" content="Portfolio of Javier Monedero Angulo — Information Systems Engineering student (UPM) and future Solutions Architect. Serverless on AWS, with an interactive 'Ask my CV' assistant powered by Amazon Bedrock.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --bg-soft: #101722;
+            --panel: rgba(255, 255, 255, 0.04);
+            --panel-border: rgba(255, 255, 255, 0.09);
+            --text: #e9eef4;
+            --muted: #98a4b3;
+            --accent: #ff9900;
+            --accent-2: #f5b34a;
+            --blue: #4fb3ff;
+            --green: #3ecf8e;
+            --radius: 14px;
+            --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+        body::before {
+            content: "";
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background:
+                radial-gradient(600px 300px at 85% -10%, rgba(255, 153, 0, 0.10), transparent 70%),
+                radial-gradient(700px 400px at -10% 20%, rgba(79, 179, 255, 0.07), transparent 70%);
+        }
+        .wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+        /* ---------- Nav ---------- */
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(11, 15, 20, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .nav-inner { max-width: 980px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+        .logo { font-weight: 800; font-size: 15px; letter-spacing: .3px; }
+        .logo span { color: var(--accent); }
+        .nav-links { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav-links a {
+            color: var(--muted); text-decoration: none; font-size: 13.5px; font-weight: 500;
+            padding: 6px 10px; border-radius: 8px; transition: .2s;
+        }
+        .nav-links a:hover { color: var(--text); background: var(--panel); }
+
+        /* ---------- Hero ---------- */
+        header.hero { padding: 96px 0 72px; }
+        .kicker {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--mono); font-size: 12.5px; color: var(--accent);
+            border: 1px solid rgba(255, 153, 0, 0.35); background: rgba(255, 153, 0, 0.07);
+            padding: 6px 12px; border-radius: 999px; margin-bottom: 22px;
+        }
+        .dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+        @keyframes pulse { 50% { opacity: .4; } }
+        h1 { font-size: clamp(34px, 6vw, 56px); font-weight: 800; letter-spacing: -1.2px; line-height: 1.08; }
+        h1 .grad {
+            background: linear-gradient(92deg, var(--accent), var(--accent-2) 55%, #ffd9a0);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .hero-sub { margin-top: 18px; font-size: 18px; color: var(--muted); max-width: 640px; }
+        .hero-sub strong { color: var(--text); font-weight: 600; }
+        .badges { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .badge {
+            font-size: 12.5px; font-weight: 600; color: var(--muted);
+            border: 1px solid var(--panel-border); background: var(--panel);
+            padding: 6px 12px; border-radius: 999px;
+        }
+        .badge b { color: var(--text); font-weight: 600; }
+        .cta-row { margin-top: 34px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 20px; border-radius: 10px; font-size: 14.5px; font-weight: 600;
+            text-decoration: none; transition: .2s; border: 1px solid transparent;
+        }
+        .btn-primary { background: var(--accent); color: #14181c; box-shadow: 0 8px 24px rgba(255, 153, 0, .25); }
+        .btn-primary:hover { background: var(--accent-2); transform: translateY(-1px); }
+        .btn-ghost { color: var(--text); border-color: var(--panel-border); background: var(--panel); }
+        .btn-ghost:hover { border-color: rgba(255,255,255,.25); transform: translateY(-1px); }
+
+        /* ---------- Sections ---------- */
+        section { padding: 64px 0; border-top: 1px solid rgba(255,255,255,.05); }
+        .sec-head { margin-bottom: 34px; }
+        .sec-tag { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+        h2 { font-size: clamp(24px, 3.5vw, 32px); font-weight: 700; letter-spacing: -.5px; margin-top: 6px; }
+        .sec-head p { color: var(--muted); margin-top: 8px; max-width: 640px; }
+
+        /* ---------- About ---------- */
+        .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+        .card {
+            background: var(--panel); border: 1px solid var(--panel-border);
+            border-radius: var(--radius); padding: 24px;
+        }
+        .about-grid .card p { color: #c6cfd9; }
+        .about-grid .card p + p { margin-top: 12px; }
+        .facts { display: grid; gap: 12px; }
+        .fact { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; border-bottom: 1px dashed rgba(255,255,255,.08); padding-bottom: 10px; }
+        .fact:last-child { border-bottom: none; padding-bottom: 0; }
+        .fact span { color: var(--muted); }
+        .fact b { font-weight: 600; text-align: right; }
+
+        /* ---------- Projects ---------- */
+        .projects-grid { display: grid; gap: 20px; }
+        .project {
+            background: var(--panel); border: 1px solid var(--panel-border);
+            border-radius: var(--radius); padding: 26px;
+            transition: border-color .25s, transform .25s;
+        }
+        .project:hover { border-color: rgba(255,153,0,.45); transform: translateY(-2px); }
+        .project-top { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+        .project h3 { font-size: 19px; font-weight: 700; letter-spacing: -.3px; }
+        .project .this-note { font-family: var(--mono); font-size: 11.5px; color: var(--green); margin-top: 4px; }
+        .repo-link {
+            font-size: 12.5px; font-weight: 600; color: var(--blue); text-decoration: none;
+            border: 1px solid rgba(79,179,255,.3); padding: 6px 12px; border-radius: 8px; white-space: nowrap;
+        }
+        .repo-link:hover { background: rgba(79,179,255,.1); }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+        .chip {
+            font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+            background: rgba(255,255,255,.03); border: 1px solid var(--panel-border);
+            padding: 4px 10px; border-radius: 6px;
+        }
+        .metrics { display: flex; gap: 26px; flex-wrap: wrap; margin: 14px 0; padding: 14px 0; border-top: 1px dashed rgba(255,255,255,.1); border-bottom: 1px dashed rgba(255,255,255,.1); }
+        .metric b { font-size: 20px; font-weight: 800; color: var(--accent); font-family: var(--mono); display: block; }
+        .metric span { font-size: 12px; color: var(--muted); }
+        .project ul { margin: 0 0 0 18px; color: #c6cfd9; font-size: 14.5px; }
+        .project ul li + li { margin-top: 7px; }
+        .project ul li::marker { color: var(--accent); }
+
+        /* ---------- Architecture ---------- */
+        .arch-flow { display: flex; flex-direction: column; gap: 0; align-items: stretch; }
+        .stage {
+            background: var(--panel); border: 1px solid var(--panel-border);
+            border-radius: var(--radius); padding: 18px 22px;
+            display: grid; grid-template-columns: 190px 1fr; gap: 14px; align-items: baseline;
+        }
+        .stage .name { font-family: var(--mono); font-size: 13.5px; font-weight: 600; color: var(--accent); }
+        .stage .desc { font-size: 13.5px; color: var(--muted); }
+        .arrow { align-self: center; color: var(--accent); font-size: 19px; padding: 6px 0; text-align: center; opacity: .8; }
+        .arch-note { margin-top: 20px; font-size: 13px; color: var(--muted); text-align: center; font-family: var(--mono); }
+
+        /* ---------- Skills ---------- */
+        .skill-group { margin-bottom: 22px; }
+        .skill-group h4 { font-size: 13px; font-family: var(--mono); color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+        .skills { display: flex; flex-wrap: wrap; gap: 9px; }
+        .skill {
+            font-size: 13.5px; font-weight: 500; padding: 7px 13px; border-radius: 8px;
+            background: rgba(255,255,255,.04); border: 1px solid var(--panel-border);
+        }
+        .skill.hot { border-color: rgba(255,153,0,.4); color: var(--accent-2); font-weight: 600; }
+
+        /* ---------- Chat ---------- */
+        .chat-shell {
+            background: var(--bg-soft); border: 1px solid var(--panel-border);
+            border-radius: var(--radius); overflow: hidden;
+        }
+        .chat-head {
+            padding: 14px 20px; background: rgba(255,255,255,.03); border-bottom: 1px solid var(--panel-border);
+            display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14.5px;
+        }
+        .chat-head .pill { margin-left: auto; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--accent); border: 1px solid rgba(255,153,0,.35); border-radius: 999px; padding: 4px 10px; }
+        #chat-messages { height: 340px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        #chat-messages::-webkit-scrollbar { width: 8px; }
+        #chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
+        .msg { max-width: 82%; padding: 11px 15px; border-radius: 14px; font-size: 14.5px; }
+        .msg.user { align-self: flex-end; background: #1c5d94; border-bottom-right-radius: 4px; }
+        .msg.bot { align-self: flex-start; background: rgba(255,255,255,.055); border: 1px solid var(--panel-border); border-bottom-left-radius: 4px; }
+        .msg.bot p + p { margin-top: 8px; }
+        .msg.bot ul { margin: 6px 0 0 18px; }
+        .msg.bot li + li { margin-top: 3px; }
+        .msg.bot code { font-family: var(--mono); font-size: 12.5px; background: rgba(255,255,255,.08); padding: 2px 6px; border-radius: 5px; }
+        .msg.bot pre { background: rgba(0,0,0,.45); border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px 12px; overflow-x: auto; margin-top: 8px; }
+        .msg.bot pre code { background: none; padding: 0; }
+        .msg.bot h3 { font-size: 15px; margin-top: 10px; }
+        .msg.bot a { color: var(--blue); }
+        .loading { color: var(--muted); font-style: italic; }
+        .loading .dots::after { content: ""; animation: dots 1.4s infinite steps(4); }
+        @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+        .suggestions { display: flex; gap: 9px; flex-wrap: wrap; padding: 12px 20px 0; }
+        .suggestion {
+            font-size: 12.5px; color: var(--muted); background: none; cursor: pointer;
+            border: 1px dashed var(--panel-border); border-radius: 999px; padding: 6px 12px; transition: .2s;
+        }
+        .suggestion:hover { color: var(--text); border-color: var(--accent); }
+        .chat-input-row { display: flex; gap: 10px; padding: 16px 20px 20px; }
+        #chat-input {
+            flex: 1; background: rgba(255,255,255,.05); border: 1px solid var(--panel-border);
+            border-radius: 10px; padding: 12px 16px; color: var(--text); font-size: 14.5px; font-family: inherit; outline: none;
+        }
+        #chat-input:focus { border-color: rgba(255,153,0,.55); }
+        #chat-input:disabled { opacity: .5; }
+        #chat-input::placeholder { color: #5c6773; }
+        #send-btn {
+            background: var(--accent); border: none; border-radius: 10px; color: #14181c;
+            font-weight: 700; font-size: 14.5px; padding: 12px 22px; cursor: pointer; transition: .2s; font-family: inherit;
+        }
+        #send-btn:hover { background: var(--accent-2); }
+        #send-btn:disabled { opacity: .5; cursor: default; }
+
+        /* ---------- Footer ---------- */
+        footer { border-top: 1px solid rgba(255,255,255,.05); padding: 48px 0 56px; }
+        .foot-grid { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+        .foot-left p { color: var(--muted); font-size: 14px; max-width: 420px; margin-top: 10px; }
+        .foot-links { display: flex; gap: 10px; flex-wrap: wrap; }
+        .foot-links a {
+            color: var(--text); text-decoration: none; font-size: 13.5px; font-weight: 600;
+            border: 1px solid var(--panel-border); background: var(--panel);
+            padding: 8px 14px; border-radius: 9px; transition: .2s;
+        }
+        .foot-links a:hover { border-color: rgba(255,153,0,.45); }
+        .foot-meta { margin-top: 30px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-family: var(--mono); font-size: 11.5px; color: #5c6773; }
+        #counter { color: var(--green); font-weight: 600; }
+
+        /* ---------- Reveal ---------- */
+        .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+        .reveal.on { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) { .reveal { transition: none; opacity: 1; transform: none; } }
+
+        /* ---------- Mobile ---------- */
+        @media (max-width: 760px) {
+            header.hero { padding: 64px 0 48px; }
+            .about-grid { grid-template-columns: 1fr; }
+            .stage { grid-template-columns: 1fr; }
+            .stage .desc { margin-top: 2px; }
+            .metrics { gap: 18px; }
+            .foot-meta { flex-direction: column; gap: 6px; }
+        }
+    </style>
 </head>
 <body>
-<h1>Portfolio Cloud en AWS - Arquitectura Serverless 🚀 (Prueba CI/CD)</h1>
-<p>Visitas: <span id="counter">Cargando...</span></p>
 
-<!-- Interfaz del Chat Widget -->
-<div id="chat-widget" style="position: fixed; bottom: 20px; right: 20px; width: 320px; border: 1px solid #ccc; border-radius: 8px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: sans-serif;">
-    <div style="background: #232F3E; color: white; padding: 10px; border-radius: 8px 8px 0 0; font-weight: bold;">
-        💬 Ask my CV (Powered by Bedrock)
+<nav>
+    <div class="nav-inner">
+        <div class="logo">javier<span>.monedero</span></div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#projects">Projects</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#skills">Skills</a>
+            <a href="#ask">Ask my CV</a>
+            <a href="#contact">Contact</a>
+        </div>
     </div>
-    <div id="chat-messages" style="height: 250px; overflow-y: auto; padding: 10px; font-size: 14px; background: #f9f9f9;">
-        <div style="margin-bottom: 8px; color: #555;"><em>¡Hola! Soy el asistente de IA de Javier. Pregúntame sobre su experiencia o certificaciones.</em></div>
+</nav>
+
+<header class="hero">
+    <div class="wrap">
+        <div class="kicker"><span class="dot"></span> OPEN TO SOLUTIONS ARCHITECT INTERNSHIPS · JUL–SEP 2027</div>
+        <h1>Hi, I'm Javier.<br>I design <span class="grad">cloud &amp; GenAI systems</span> that ship.</h1>
+        <p class="hero-sub">
+            Information Systems Engineering student at <strong>UPM (Madrid)</strong> on the
+            <strong>Solutions Architect</strong> path. I build real, running systems — an autonomous
+            email engine with batch LLM inference, this fully serverless portfolio on AWS, and a 24/7
+            self-hosted homelab.
+        </p>
+        <div class="badges">
+            <div class="badge">🎓 <b>3rd year</b> · Class of 2028</div>
+            <div class="badge">📚 <b>AWS SAA</b> in progress · exam Dec 2026</div>
+            <div class="badge">📍 Madrid, Spain</div>
+        </div>
+        <div class="cta-row">
+            <a class="btn btn-primary" href="#ask">💬 Ask my CV — live Bedrock assistant</a>
+            <a class="btn btn-ghost" href="https://github.com/JavierMonederoAngulo" target="_blank" rel="noopener">GitHub ↗</a>
+            <a class="btn btn-ghost" href="https://www.linkedin.com/in/javier-monedero-angulo-798248445" target="_blank" rel="noopener">LinkedIn ↗</a>
+        </div>
     </div>
-    <div style="display: flex; padding: 10px; border-top: 1px solid #eee;">
-        <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; outline: none;">
-        <button onclick="askBedrock()" style="margin-left: 8px; padding: 8px 12px; background: #FF9900; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Enviar</button>
+</header>
+
+<section id="about">
+    <div class="wrap">
+        <div class="sec-head">
+            <div class="sec-tag">// about</div>
+            <h2>Architect first, builder always.</h2>
+        </div>
+        <div class="about-grid">
+            <div class="card reveal">
+                <p>
+                    I'm a third-year <strong>BSc Information Systems Engineering</strong> student at
+                    <strong>Universidad Politécnica de Madrid (ETSISI)</strong>, and I've chosen the
+                    Solutions Architect path deliberately: what I enjoy most is designing how systems
+                    fit together — then building them myself to prove the design works.
+                </p>
+                <p>
+                    My work combines three things I care about: <strong>cloud architecture on AWS</strong>
+                    (currently preparing the <strong>AWS Solutions Architect – Associate</strong>
+                    certification, exam December 2026), <strong>generative AI applied to real problems</strong>
+                    (LLM APIs, batch inference, agentic workflows), and <strong>systems thinking</strong>
+                    — every project on this page is running in production for real users, including me.
+                </p>
+            </div>
+            <div class="card facts reveal">
+                <div class="fact"><span>Degree</span><b>Information Systems Eng. · UPM</b></div>
+                <div class="fact"><span>Graduation</span><b>June 2028</b></div>
+                <div class="fact"><span>Main language</span><b>Java (6 courses)</b></div>
+                <div class="fact"><span>Cloud focus</span><b>AWS · SAA in progress</b></div>
+                <div class="fact"><span>AI focus</span><b>LLM APIs · Bedrock · n8n agents</b></div>
+                <div class="fact"><span>Availability</span><b>Jul – Sep 2027 · full-time</b></div>
+                <div class="fact"><span>Languages</span><b>Spanish (native) · English (C1 listening/reading)</b></div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
+<section id="projects">
+    <div class="wrap">
+        <div class="sec-head">
+            <div class="sec-tag">// projects</div>
+            <h2>Three systems. All running. All mine.</h2>
+            <p>Not coursework — self-initiated, self-built, documented like production systems.</p>
+        </div>
+        <div class="projects-grid">
+
+            <article class="project reveal">
+                <div class="project-top">
+                    <div>
+                        <h3>🤖 Autonomous GenAI Email Classification &amp; Routing Engine</h3>
+                        <div class="this-note">Self-hosted · running in production for my own inbox</div>
+                    </div>
+                    <a class="repo-link" href="https://github.com/JavierMonederoAngulo/n8n-ai-email-orchestrator" target="_blank" rel="noopener">View repo ↗</a>
+                </div>
+                <div class="chips">
+                    <span class="chip">n8n (Docker)</span><span class="chip">Ubuntu Server</span>
+                    <span class="chip">Google Gemini API</span><span class="chip">Microsoft Graph API</span><span class="chip">JavaScript</span>
+                </div>
+                <div class="metrics">
+                    <div class="metric"><b>2,000+</b><span>emails classified &amp; routed</span></div>
+                    <div class="metric"><b>−98%</b><span>LLM API calls via batch aggregation</span></div>
+                    <div class="metric"><b>~2.4 s</b><span>per email, end to end</span></div>
+                    <div class="metric"><b>4</b><span>Architecture Decision Records</span></div>
+                </div>
+                <ul>
+                    <li><strong>Orchestrator-Worker architecture</strong> — decoupled pagination from processing to avoid Node.js V8 memory leaks in long loops.</li>
+                    <li><strong>N-to-1 aggregation</strong> — a custom JS layer packs each 50-email batch into one structured payload, so a batch needs a single Gemini inference call instead of 50.</li>
+                    <li><strong>3-tier fault tolerance</strong> — transient-failure retries, item-level poison-pill isolation with a local dead-letter log, and an out-of-band catastrophic handler with zero circular dependencies.</li>
+                    <li>Every decision documented as <strong>ADRs</strong> in the repo README, including how each part maps to native AWS services (Step Functions, Lambda, SQS, Bedrock).</li>
+                </ul>
+            </article>
+
+            <article class="project reveal">
+                <div class="project-top">
+                    <div>
+                        <h3>☁️ This website — Serverless Cloud Portfolio on AWS</h3>
+                        <div class="this-note">✦ Yes — the page you are reading right now is the project</div>
+                    </div>
+                </div>
+                <div class="chips">
+                    <span class="chip">S3 + OAC</span><span class="chip">CloudFront</span><span class="chip">Lambda (Python)</span>
+                    <span class="chip">DynamoDB</span><span class="chip">API Gateway</span><span class="chip">Amazon Bedrock</span><span class="chip">GitHub Actions + OIDC</span>
+                </div>
+                <ul>
+                    <li><strong>Private edge delivery</strong> — S3 with all public access blocked, served globally over HTTPS through CloudFront with Origin Access Control.</li>
+                    <li><strong>Live visitor counter</strong> — API Gateway (throttled) → Lambda → DynamoDB atomic counter, under strict least-privilege IAM.</li>
+                    <li><strong>"Ask my CV" assistant</strong> — a Lambda-powered chat backed by <strong>Amazon Bedrock</strong>, with my CV injected as context from S3. Try it below — recruiters welcome.</li>
+                    <li><strong>CI/CD without secrets</strong> — GitHub Actions deploys on every push using OIDC; no long-lived AWS credentials anywhere. Billing alarms on, Free Tier respected.</li>
+                </ul>
+            </article>
+
+            <article class="project reveal">
+                <div class="project-top">
+                    <div>
+                        <h3>🎮 Self-hosted Remote Gaming Homelab</h3>
+                        <div class="this-note">Running 24/7 · real users (my family)</div>
+                    </div>
+                </div>
+                <div class="chips">
+                    <span class="chip">Raspberry Pi</span><span class="chip">Ubuntu Server</span>
+                    <span class="chip">Tailscale (mesh VPN)</span><span class="chip">Wake-on-LAN</span><span class="chip">Game streaming</span>
+                </div>
+                <ul>
+                    <li>An always-on Raspberry Pi node with <strong>Ubuntu Server</strong>, reachable from anywhere through a <strong>Tailscale mesh VPN</strong>.</li>
+                    <li><strong>Wake-on-LAN</strong> powers the gaming PC on demand — low-latency game streaming from the living room to anywhere with internet.</li>
+                    <li>Researched, integrated and configured the full stack myself; it has been quietly serving my family for years.</li>
+                </ul>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<section id="architecture">
+    <div class="wrap">
+        <div class="sec-head">
+            <div class="sec-tag">// architecture</div>
+            <h2>How this page reaches you.</h2>
+            <p>A website that documents its own architecture — the most Solutions-Architect thing it can do.</p>
+        </div>
+        <div class="arch-flow reveal">
+            <div class="stage">
+                <div class="name">🌐 Your browser</div>
+                <div class="desc">Requests this page and talks to the API — nothing else.</div>
+            </div>
+            <div class="arrow">▼ &nbsp; HTTPS</div>
+            <div class="stage">
+                <div class="name">⚡ CloudFront</div>
+                <div class="desc">Global CDN with HTTPS. Origin Access Control — the only door into S3.</div>
+            </div>
+            <div class="stage">
+                <div class="name">🪣 S3</div>
+                <div class="desc">Static site + my CV document, stored with all public access blocked.</div>
+            </div>
+            <div class="arrow">▼ &nbsp; POST /visit &nbsp;·&nbsp; POST /chat</div>
+            <div class="stage">
+                <div class="name">🚪 API Gateway</div>
+                <div class="desc">HTTP API with throttling — the single, guarded entry to the backend.</div>
+            </div>
+            <div class="stage">
+                <div class="name">λ Lambda</div>
+                <div class="desc">Python + boto3. Two jobs: atomic visitor counter · "Ask my CV" orchestrator.</div>
+            </div>
+            <div class="arrow">▼ &nbsp; reads / writes</div>
+            <div class="stage">
+                <div class="name">📊 DynamoDB &nbsp;·&nbsp; 🧠 Bedrock</div>
+                <div class="desc">Counter state with atomic updates &nbsp;·&nbsp; the LLM that answers your questions, with my CV as in-context knowledge from S3.</div>
+            </div>
+        </div>
+        <p class="arch-note">deployed via GitHub Actions + OIDC — no long-lived credentials · billing alarms on · AWS Free Tier</p>
+    </div>
+</section>
+
+<section id="skills">
+    <div class="wrap">
+        <div class="sec-head">
+            <div class="sec-tag">// skills</div>
+            <h2>Honest levels. No padding.</h2>
+        </div>
+        <div class="skill-group reveal">
+            <h4>Programming</h4>
+            <div class="skills">
+                <span class="skill hot">Java — main language</span>
+                <span class="skill">Python (boto3 · Lambda)</span>
+                <span class="skill">SQL</span>
+                <span class="skill">JavaScript (n8n Code nodes)</span>
+            </div>
+        </div>
+        <div class="skill-group reveal">
+            <h4>Cloud &amp; AWS</h4>
+            <div class="skills">
+                <span class="skill">S3</span><span class="skill">CloudFront (CDN · OAC)</span><span class="skill">Lambda</span>
+                <span class="skill">DynamoDB</span><span class="skill">API Gateway</span><span class="skill">IAM</span>
+                <span class="skill">GitHub Actions + OIDC</span><span class="skill hot">SAA cert — in progress (Dec 2026)</span>
+            </div>
+        </div>
+        <div class="skill-group reveal">
+            <h4>Systems &amp; Infra</h4>
+            <div class="skills">
+                <span class="skill">Linux (Ubuntu Server)</span><span class="skill">Docker</span><span class="skill">Git / GitHub</span>
+                <span class="skill">REST APIs</span><span class="skill">OAuth2</span><span class="skill">Networking (VPN · WoL)</span>
+            </div>
+        </div>
+        <div class="skill-group reveal">
+            <h4>Generative AI</h4>
+            <div class="skills">
+                <span class="skill hot">LLM API integration</span><span class="skill">Amazon Bedrock</span>
+                <span class="skill">Gemini batch inference</span><span class="skill">Prompt engineering (structured JSON)</span>
+                <span class="skill">n8n agentic workflows</span><span class="skill">AI coding assistants — daily</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="ask">
+    <div class="wrap">
+        <div class="sec-head">
+            <div class="sec-tag">// ask my cv</div>
+            <h2>Don't read the CV. Ask it.</h2>
+            <p>A live assistant backed by Amazon Bedrock with my CV as context — deployed on this very stack.</p>
+        </div>
+        <div class="chat-shell reveal">
+            <div class="chat-head">💬 Ask my CV <span class="pill">powered by Amazon Bedrock</span></div>
+            <div id="chat-messages">
+                <div class="msg bot">Hi! I'm Javier's portfolio assistant — I know his studies, projects, skills and availability. Ask me anything about him.</div>
+            </div>
+            <div class="suggestions">
+                <button class="suggestion" onclick="sendSuggestion('What projects has Javier built?')">What projects has he built?</button>
+                <button class="suggestion" onclick="sendSuggestion('Why does Javier want to be a Solutions Architect?')">Why Solutions Architect?</button>
+                <button class="suggestion" onclick="sendSuggestion('What is his experience with AWS and generative AI?')">AWS &amp; GenAI experience?</button>
+            </div>
+            <div class="chat-input-row">
+                <input type="text" id="chat-input" placeholder="Ask about his studies, projects, skills, availability..." autocomplete="off">
+                <button id="send-btn" onclick="askBedrock()">Send</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer id="contact">
+    <div class="wrap">
+        <div class="foot-grid">
+            <div class="foot-left">
+                <div class="logo">javier<span>.monedero</span></div>
+                <p>Available for a full-time 3-month internship · July–September 2027 · Madrid, Spain.</p>
+            </div>
+            <div class="foot-links">
+                <a href="mailto:javier.monedero@outlook.com">✉️ Email</a>
+                <a href="https://github.com/JavierMonederoAngulo" target="_blank" rel="noopener">GitHub ↗</a>
+                <a href="https://www.linkedin.com/in/javier-monedero-angulo-798248445" target="_blank" rel="noopener">LinkedIn ↗</a>
+            </div>
+        </div>
+        <div class="foot-meta">
+            <span>You are visitor <span id="counter">…</span> — counted live by Lambda + DynamoDB ☁️</span>
+            <span>static · serverless · deployed via GitHub Actions (OIDC) · no long-lived credentials</span>
+        </div>
+    </div>
+</footer>
 
 <script>
-    // Define aquí tu URL base (sin /visit ni /chat al final)
+    // ====== API wiring (preserved exactly from the working version) ======
     const API_BASE = "https://1ykpc6crlc.execute-api.eu-west-1.amazonaws.com";
 
-    // 1. Contador de Visitas
+    // ====== Utilities: escape + tiny Markdown renderer for bot replies ======
+    function escapeHtml(s) {
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+    function renderMarkdown(md) {
+        let t = escapeHtml(md);
+        // fenced code blocks
+        t = t.replace(/```([\s\S]*?)```/g, function(_, code) { return "<pre><code>" + code.trim() + "</code></pre>"; });
+        // inline code
+        t = t.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+        // links [text](url) — http(s) only
+        t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+            '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        // bold / italic
+        t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+        t = t.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+        // headings
+        t = t.replace(/^###\s+(.+)$/gm, "<h3>$1</h3>");
+        t = t.replace(/^##\s+(.+)$/gm, "<h3>$1</h3>");
+        t = t.replace(/^#\s+(.+)$/gm, "<h3>$1</h3>");
+        // lists (consecutive lines)
+        t = t.replace(/((?:^[-*]\s+.+\n?)+)/gm, function(m) {
+            var items = m.trim().split(/\n/).map(function(l) { return "<li>" + l.replace(/^[-*]\s+/, "") + "</li>"; }).join("");
+            return "<ul>" + items + "</ul>";
+        });
+        // newlines
+        t = t.replace(/\n/g, "<br>");
+        return t;
+    }
+
+    // ====== Visitor counter (POST /visit -> {visits}) ======
     async function updateVisitCounter() {
         try {
             const response = await fetch(`${API_BASE}/visit`, { method: "POST" });
             if (response.ok) {
                 const data = await response.json();
-                document.getElementById("counter").innerText = data.visits;
+                document.getElementById("counter").innerText = "#" + data.visits;
             }
         } catch (error) {
             document.getElementById("counter").innerText = "N/A";
         }
     }
 
-    // 2. Chat con Bedrock
+    // ====== Chat with Bedrock (POST /chat, {question} => {reply}) ======
+    // NOTE: no Content-Type header on purpose — keeps this a CORS "simple request"
+    // (matches the API Gateway CORS configuration already deployed).
     async function askBedrock() {
         const inputField = document.getElementById("chat-input");
+        const sendBtn = document.getElementById("send-btn");
         const messagesDiv = document.getElementById("chat-messages");
         const question = inputField.value.trim();
-
         if (!question) return;
 
-        // Mostrar pregunta del usuario
-        messagesDiv.innerHTML += `<div style="margin-bottom: 8px; text-align: right;"><span style="background: #0073BB; color: white; padding: 6px 10px; border-radius: 12px; display: inline-block;">${question}</span></div>`;
+        // user bubble (escaped)
+        messagesDiv.insertAdjacentHTML("beforeend",
+            '<div class="msg user">' + escapeHtml(question) + '</div>');
         inputField.value = "";
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-        // Mostrar indicador de carga
+        // loading + disable input while the assistant thinks
+        inputField.disabled = true; sendBtn.disabled = true;
         const loadingId = "loading-" + Date.now();
-        messagesDiv.innerHTML += `<div id="${loadingId}" style="margin-bottom: 8px; color: #888;"><em>La IA está leyendo el CV...</em></div>`;
+        messagesDiv.insertAdjacentHTML("beforeend",
+            '<div class="msg bot loading" id="' + loadingId + '">Reading the CV<span class="dots"></span></div>');
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
         try {
             const response = await fetch(`${API_BASE}/chat`, {
                 method: "POST",
-                body: JSON.stringify({ question: question }) // Solicitud "Simple" CORS sin Content-Type explícito
+                body: JSON.stringify({ question: question })
             });
-
             const data = await response.json();
             document.getElementById(loadingId).remove();
-
             if (response.ok) {
-                messagesDiv.innerHTML += `<div style="margin-bottom: 8px; text-align: left;"><span style="background: #e1e1e1; color: #333; padding: 6px 10px; border-radius: 12px; display: inline-block;">${data.reply}</span></div>`;
+                // reply rendered as Markdown
+                messagesDiv.insertAdjacentHTML("beforeend",
+                    '<div class="msg bot">' + renderMarkdown(data.reply) + '</div>');
             } else {
-                throw new Error("Error del servidor");
+                throw new Error("server error");
             }
         } catch (error) {
-            document.getElementById(loadingId).remove();
-            messagesDiv.innerHTML += `<div style="margin-bottom: 8px; color: red;"><em>Error de conexión con el asistente.</em></div>`;
+            const el = document.getElementById(loadingId);
+            if (el) el.remove();
+            messagesDiv.insertAdjacentHTML("beforeend",
+                '<div class="msg bot loading" style="color:#ff7a7a;">Connection issue — the assistant is unreachable right now.</div>');
         }
+        inputField.disabled = false; sendBtn.disabled = false;
+        inputField.focus();
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    // Permitir enviar con la tecla Enter
-    document.getElementById("chat-input").addEventListener("keypress", function(event) {
+    function sendSuggestion(q) {
+        document.getElementById("chat-input").value = q;
+        askBedrock();
+    }
+
+    // Enter to send
+    document.getElementById("chat-input").addEventListener("keypress", function (event) {
         if (event.key === "Enter") askBedrock();
     });
 
-    // Inicializar
+    // ====== Scroll reveal ======
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+
+    // ====== Init ======
     updateVisitCounter();
 </script>
 </body>
