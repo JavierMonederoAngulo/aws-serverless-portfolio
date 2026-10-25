@@ -1,5 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    Tracing: Active # Activa X-Ray para ver cuánto tarda Bedrock o DynamoDB
+  Api:
+    TracingEnabled: true # Activa X-Ray en el API Gateway
+    MethodSettings:
+      - ResourcePath: "/*"
+        HttpMethod: "*"
+        ThrottlingBurstLimit: 10  # Máximo de peticiones de golpe
+        ThrottlingRateLimit: 5    # Máximo de peticiones por segundo sostenidas
 Description: Backend Serverless para Cloud Portfolio (DynamoDB + Lambda + HTTP API)
 
 Resources:
