@@ -1,6 +1,14 @@
 name: Deploy AWS Portfolio
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # (o master, según cómo se llame tu rama principal)
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - 'template.yaml'
+      - '.github/workflows/**'
 
 # Permiso necesario para que GitHub solicite el token OIDC a AWS
 permissions:

@@ -1,6 +1,6 @@
 # ☁️ Serverless Cloud Portfolio & GenAI CV Assistant on AWS
 
-🌐 **Live Demo:** [https://TU-URL-DE-CLOUDFRONT.net](https://TU-URL-DE-CLOUDFRONT.net)
+🌐 **Live Demo:** [https://d3vjauql06bl7n.cloudfront.net](https://d3vjauql06bl7n.cloudfront.net)
 
 A 100% serverless personal portfolio and interactive AI assistant built on **AWS (`eu-west-1`)** using Infrastructure as Code (**AWS SAM**). Designed to demonstrate cloud architecture patterns, security best practices, and practical Generative AI integration.
 
