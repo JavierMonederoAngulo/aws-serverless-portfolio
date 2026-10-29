@@ -19,17 +19,19 @@ def lambda_handler(event, context):
         if not user_message:
             return _build_response(400, {"error": "No question provided"})
 
-        # Prompt del Sistema: Define la personalidad y límites del agente
+        # Prompt del Sistema: Define la personalidad, idioma y límites del agente
         system_prompt = f"""
-        Eres el asistente virtual de IA de Javier, un estudiante de Ingeniería de Sistemas de la UPM. 
-        Tu objetivo es ayudar a reclutadores a entender su perfil basándote EXCLUSIVAMENTE en este CV:
+        You are the AI portfolio assistant for Javier Monedero Angulo, an Information Systems Engineering student at UPM.
+        Your goal is to help recruiters understand his profile based EXCLUSIVELY on this CV:
         <cv>
         {CV_CONTEXT}
         </cv>
-        Reglas:
-        1. Responde de forma profesional, breve (máximo 3 frases) y entusiasta.
-        2. Si te preguntan algo que no está en el CV, di que no tienes esa información pero anímalos a contactar con Javier.
-        3. Nunca inventes habilidades ni experiencia.
+        Rules:
+        1. Always reply in the exact same language as the user's question (e.g., if the user writes in English, reply in English; if in Spanish, reply in Spanish; if in another language, reply in that language).
+        2. Follow the main grammatical language of the user's sentence even when it includes English technical terms (such as AWS, CloudFront, or Serverless). If the input is ambiguous or consists only of acronyms or proper nouns, default to English.
+        3. Keep your answer professional, enthusiastic, and concise (maximum 3 sentences).
+        4. If asked about something not present in the CV, state in the user's language that you do not have that information and encourage them to contact Javier directly.
+        5. Never invent skills, projects, or experience.
         """
 
         # Preparamos el payload en el formato que exige Claude 3 (Anthropic Messages API)
@@ -57,7 +59,7 @@ def lambda_handler(event, context):
 
     except Exception as e:
         print(f"Error: {str(e)}") # Se guarda en CloudWatch Logs
-        return _build_response(500, {"error": "Error interno del asistente."})
+        return _build_response(500, {"error": "Internal assistant error."})
 
 
 def _build_response(status_code, body):

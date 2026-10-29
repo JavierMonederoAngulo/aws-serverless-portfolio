@@ -1,1 +1,0 @@
-![Diagrama de Arquitectura AWS](arquitectura.png)
