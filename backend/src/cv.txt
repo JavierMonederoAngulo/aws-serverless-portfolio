@@ -47,10 +47,14 @@ The site you are using right now. Architecture:
   Amazon CloudFront with Origin Access Control (OAC).
 - Visitor counter: Amazon API Gateway (HTTP API, throttling) → AWS Lambda (Python, boto3) →
   Amazon DynamoDB atomic counter, under strict IAM least-privilege policies.
-- This "Ask my CV" assistant: AWS Lambda calling Amazon Bedrock with my CV context injected
-  from S3 (in-context knowledge). I deliberately did NOT build a RAG/vector index because
-  the corpus fits entirely in the prompt window; I would move to Amazon Knowledge Bases if
-  the document set grew.
+- This "Ask my CV" assistant: AWS Lambda (Python 3.12, arm64) calling Amazon Bedrock
+  (Claude Haiku 4.5 EU cross-region inference profile) with stateless multi-turn memory and
+  live FinOps telemetry. My CV context (cv.txt) is packaged with the function and loaded
+  once into RAM during the Lambda Cold Start (reused across Warm Starts rather than reading
+  from S3 on every request). I deliberately omitted both RAG/vector databases and Prompt
+  Caching because the entire CV corpus (~1,000 tokens) fits comfortably in the context
+  window and is below the 2,048-token minimum threshold required by Claude Haiku 4.5 for
+  prompt caching; I would move to Amazon Bedrock Knowledge Bases if the document set grew.
 - CI/CD: GitHub Actions deploys on every push using OIDC — no long-lived AWS credentials.
 - Cost awareness: billing alarms configured; everything runs within AWS Free Tier limits.
 

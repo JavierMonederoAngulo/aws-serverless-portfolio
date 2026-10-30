@@ -784,6 +784,28 @@
             border-radius: var(--radius-sm);
             padding: 4px 10px;
         }
+        .chat-clear-btn {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            background: var(--panel);
+            border: 1px solid var(--panel-border-strong);
+            border-radius: var(--radius-sm);
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: color .18s ease, border-color .18s ease, background-color .18s ease;
+            touch-action: manipulation;
+        }
+        .chat-clear-btn:hover:not(:disabled) {
+            color: var(--text);
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+        .chat-clear-btn:disabled {
+            opacity: .5;
+            cursor: default;
+        }
         #chat-messages {
             height: 350px;
             overflow-y: auto;
@@ -844,6 +866,32 @@
         .msg.bot pre code { background: none; padding: 0; color: var(--text); }
         .msg.bot h3 { font-family: var(--display); font-size: 15px; margin-top: 10px; color: var(--text); }
         .msg.bot a { color: var(--blue); }
+        .msg-telemetry {
+            align-self: flex-start;
+            margin-top: -8px;
+            padding-left: 4px;
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+        .telemetry-dot {
+            font-size: 10px;
+            margin-right: 2px;
+        }
+        .telemetry-dot.cold { color: var(--accent); }
+        .telemetry-dot.warm { color: var(--green); }
+        .char-counter {
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: var(--muted);
+            align-self: center;
+            white-space: nowrap;
+            min-width: 48px;
+            text-align: right;
+            user-select: none;
+        }
+        .char-counter.limit { color: var(--accent); font-weight: 600; }
         .loading {
             color: var(--muted);
             font-family: var(--mono);
@@ -876,10 +924,14 @@
             color: var(--accent);
             font-weight: 600;
         }
-        .suggestion:hover {
+        .suggestion:hover:not(:disabled) {
             color: var(--text);
             border-color: var(--accent);
             background: var(--accent-dim);
+        }
+        .suggestion:disabled {
+            opacity: .5;
+            cursor: default;
         }
         .chat-input-row {
             display: flex;
@@ -1263,7 +1315,11 @@
             <p>A live assistant backed by Amazon Bedrock (Claude Haiku 4.5 EU profile) with my CV injected as context.</p>
         </div>
         <div class="chat-shell reveal">
-            <div class="chat-head"><span aria-hidden="true">💬</span> Ask my CV <span class="pill">powered by Amazon Bedrock (EU)</span></div>
+            <div class="chat-head">
+                <span aria-hidden="true">💬</span> Ask my CV
+                <span class="pill">powered by Amazon Bedrock (EU)</span>
+                <button type="button" id="clear-chat-btn" class="chat-clear-btn" onclick="clearChat()" aria-label="Clear conversation history">Clear</button>
+            </div>
             <div id="chat-messages" role="log" aria-live="polite">
                 <div class="msg bot">Hi! I'm Javier's portfolio assistant — I know his studies at UPM, his projects, his technical skills, and his internship availability. Ask me anything about him!</div>
             </div>
@@ -1273,7 +1329,8 @@
                 <button type="button" class="suggestion" onclick="sendSuggestion('What is his experience with AWS and generative AI?')">AWS &amp; GenAI experience?</button>
             </div>
             <div class="chat-input-row">
-                <input type="text" id="chat-input" name="question" aria-label="Ask a question about Javier's CV" placeholder="Ask about his studies, projects, skills, availability…" autocomplete="off">
+                <input type="text" id="chat-input" name="question" maxlength="500" aria-label="Ask a question about Javier's CV" placeholder="Ask about his studies, projects, skills, availability…" autocomplete="off">
+                <span id="char-counter" class="char-counter" aria-live="polite">0/500</span>
                 <button type="button" id="send-btn" onclick="askBedrock()">Send</button>
             </div>
         </div>
@@ -1354,22 +1411,76 @@
         }
     }
 
-    // ====== Chat with Bedrock (POST /chat, {question} => {reply}) ======
-    async function askBedrock() {
+    // ====== Chat with Bedrock (POST /chat, {question, history} => {reply, telemetry}) ======
+    const INITIAL_WELCOME_HTML = '<div class="msg bot">Hi! I\'m Javier\'s portfolio assistant — I know his studies at UPM, his projects, his technical skills, and his internship availability. Ask me anything about him!</div>';
+    let chatHistory = [];
+
+    function setChatControlsDisabled(disabled) {
         const inputField = document.getElementById("chat-input");
         const sendBtn = document.getElementById("send-btn");
+        const clearBtn = document.getElementById("clear-chat-btn");
+        if (inputField) inputField.disabled = disabled;
+        if (sendBtn) sendBtn.disabled = disabled;
+        if (clearBtn) clearBtn.disabled = disabled;
+        document.querySelectorAll(".suggestion").forEach(function (btn) {
+            btn.disabled = disabled;
+        });
+    }
+
+    function updateCharCounter() {
+        const inputField = document.getElementById("chat-input");
+        const counterEl = document.getElementById("char-counter");
+        if (!inputField || !counterEl) return;
+        const len = inputField.value.length;
+        counterEl.textContent = len + "/500";
+        counterEl.classList.toggle("limit", len >= 500);
+    }
+
+    function renderTelemetry(telemetry) {
+        if (!telemetry || typeof telemetry !== "object") return "";
+        const isCold = Boolean(telemetry.cold_start);
+        const stateLabel = isCold ? "COLD START" : "WARM START";
+        const dotClass = isCold ? "cold" : "warm";
+        const latency = Number.isFinite(Number(telemetry.latency_ms)) ? Math.round(Number(telemetry.latency_ms)) : 0;
+        const inTok = Number.isFinite(Number(telemetry.input_tokens)) ? Math.round(Number(telemetry.input_tokens)) : 0;
+        const outTok = Number.isFinite(Number(telemetry.output_tokens)) ? Math.round(Number(telemetry.output_tokens)) : 0;
+        const cost = Number.isFinite(Number(telemetry.estimated_cost_usd)) ? Number(telemetry.estimated_cost_usd).toFixed(6) : "0.000000";
+        return '<div class="msg-telemetry"><span class="telemetry-dot ' + dotClass + '" aria-hidden="true">●</span> ' +
+            stateLabel + ' · ' + latency + ' ms · ' + inTok + ' in / ' + outTok + ' out tok · $' + cost + '</div>';
+    }
+
+    function clearChat() {
+        chatHistory = [];
+        const messagesDiv = document.getElementById("chat-messages");
+        const inputField = document.getElementById("chat-input");
+        if (messagesDiv) {
+            messagesDiv.innerHTML = INITIAL_WELCOME_HTML;
+            messagesDiv.scrollTop = 0;
+        }
+        if (inputField) {
+            inputField.value = "";
+            updateCharCounter();
+            inputField.focus();
+        }
+    }
+
+    async function askBedrock() {
+        const inputField = document.getElementById("chat-input");
         const messagesDiv = document.getElementById("chat-messages");
         const question = inputField.value.trim();
-        if (!question) return;
+        if (!question || question.length > 500) return;
+
+        const historyToSend = chatHistory.slice(-6);
 
         // user bubble (escaped)
         messagesDiv.insertAdjacentHTML("beforeend",
             '<div class="msg user">' + escapeHtml(question) + '</div>');
         inputField.value = "";
+        updateCharCounter();
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-        // loading + disable input while the assistant thinks
-        inputField.disabled = true; sendBtn.disabled = true;
+        // loading + disable controls while the assistant thinks
+        setChatControlsDisabled(true);
         const loadingId = "loading-" + Date.now();
         messagesDiv.insertAdjacentHTML("beforeend",
             '<div class="msg bot loading" id="' + loadingId + '">Reading the CV<span class="dots"></span></div>');
@@ -1378,14 +1489,22 @@
         try {
             const response = await fetch(`${API_BASE}/chat`, {
                 method: "POST",
-                body: JSON.stringify({ question: question })
+                body: JSON.stringify({ question: question, history: historyToSend })
             });
             const data = await response.json();
             document.getElementById(loadingId).remove();
             if (response.ok) {
-                // reply rendered as Markdown
+                chatHistory.push(
+                    { role: "user", content: question },
+                    { role: "assistant", content: data.reply }
+                );
+                chatHistory = chatHistory.slice(-6);
+                // reply rendered as Markdown + optional live FinOps telemetry
                 messagesDiv.insertAdjacentHTML("beforeend",
-                    '<div class="msg bot">' + renderMarkdown(data.reply) + '</div>');
+                    '<div class="msg bot">' + renderMarkdown(data.reply) + '</div>' + renderTelemetry(data.telemetry));
+            } else if (response.status === 400 && data && data.error) {
+                messagesDiv.insertAdjacentHTML("beforeend",
+                    '<div class="msg bot loading" style="color:#ff7a7a;">' + escapeHtml(String(data.error)) + '</div>');
             } else {
                 throw new Error("server error");
             }
@@ -1395,17 +1514,19 @@
             messagesDiv.insertAdjacentHTML("beforeend",
                 '<div class="msg bot loading" style="color:#ff7a7a;">Connection issue — the assistant is unreachable right now.</div>');
         }
-        inputField.disabled = false; sendBtn.disabled = false;
+        setChatControlsDisabled(false);
         inputField.focus();
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
     function sendSuggestion(q) {
         document.getElementById("chat-input").value = q;
+        updateCharCounter();
         askBedrock();
     }
 
-    // Enter to send
+    // Live character counter (0/500) + Enter to send
+    document.getElementById("chat-input").addEventListener("input", updateCharCounter);
     document.getElementById("chat-input").addEventListener("keypress", function (event) {
         if (event.key === "Enter") askBedrock();
     });
