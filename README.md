@@ -14,7 +14,7 @@ A 100% serverless personal portfolio and interactive AI assistant built on **AWS
 1. **Static Edge Delivery:** Users access the frontend over HTTPS via **Amazon CloudFront**. Static assets (`index.html`) are stored in a private **Amazon S3** bucket with all public access blocked, accessible strictly through CloudFront **Origin Access Control (OAC)**.
 2. **Serverless API Layer:** Asynchronous `POST /visit` and `POST /chat` requests are routed through **Amazon API Gateway** (HTTP API) with CORS and rate-limiting enabled.
 3. **Compute & Orchestration:** **AWS Lambda** (Python 3.12, `arm64`, `boto3`) processes incoming requests under strict least-privilege IAM roles:
-   - `/visit`: Performs atomic counter updates in **Amazon DynamoDB**.
+   - `/visit`: Performs atomic counter updates in **Amazon DynamoDB**, deduplicated per browser-tab session (`sessionStorage`) to prevent reload inflation and save Lambda invocations and database writes.
    - `/chat`: Validates input & conversation bounds, injects CV context from RAM (loaded once during Lambda Cold Start) alongside stateless multi-turn history (up to 3 prior turns / 6 messages), invokes **Amazon Bedrock** (`eu.anthropic.claude-haiku-4-5`) via an EU Cross-Region Inference profile, and returns live execution & FinOps telemetry (`cold_start`, `latency_ms`, `input_tokens`, `output_tokens`, `estimated_cost_usd`).
 
 ### Architecture Decision Records (ADRs)
@@ -38,7 +38,7 @@ A 100% serverless personal portfolio and interactive AI assistant built on **AWS
   * **API & Payload Protection:** API Gateway configured with throttling (`RateLimit: 5 req/s`, `BurstLimit: 10`) combined with strict pre-inference Lambda input guards (question `<= 500` chars, history `<= 6` alternating `user`/`assistant` messages of `<= 1,000` chars each) that reject malformed payloads with `HTTP 400` before invoking Bedrock.
   * **GDPR Data Residency:** Bedrock calls use the `eu.` inference profile, ensuring prompts and completions remain strictly within European Union AWS regions.
 * **Operational Excellence & Performance Efficiency:**
-  * **Infrastructure as Code (IaC):** Entire stack declaratively defined in `template.yaml` using **AWS SAM** and validated with automated unit tests (`unittest`/`pytest`).
+  * **Infrastructure as Code (IaC) & CI/CD Quality Gate:** Entire stack declaratively defined in `template.yaml` using **AWS SAM** and gated in GitHub Actions by automated unit tests (`unittest.mock` across both Lambda handlers) and `sam validate` before any build, AWS deployment, or S3 sync.
   * **Distributed Tracing & Live Telemetry:** **AWS X-Ray** (`Tracing: Active`) enabled across API Gateway and Lambda, complemented by a real-time terminal telemetry bar in the chat UI displaying **Cold vs. Warm Start** state, inference latency (`ms`), token usage (`in`/`out`), and estimated cost per query.
   * **Stateless Multi-Turn Memory:** The browser maintains a sliding window of up to 6 messages (3 turns) in session memory with a one-click `Clear` reset, enabling natural follow-up questions with zero server-side state or database overhead.
 * **Cost Optimization (FinOps):**

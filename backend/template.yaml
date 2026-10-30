@@ -107,3 +107,6 @@ Outputs:
   ApiEndpoint:
     Description: URL del endpoint de API Gateway para el frontend
     Value: !Sub "https://${PortfolioHttpApi}.execute-api.${AWS::Region}.amazonaws.com/visit"
+  ChatApiEndpoint:
+    Description: URL del endpoint de API Gateway para el asistente de CV
+    Value: !Sub "https://${PortfolioHttpApi}.execute-api.${AWS::Region}.amazonaws.com/chat"

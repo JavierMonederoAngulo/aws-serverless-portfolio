@@ -47,13 +47,17 @@ The site you are using right now. Architecture & components:
 - Static frontend on Amazon S3 with public access blocked (BlockPublicAccess), delivered
   globally over HTTPS via Amazon CloudFront with Origin Access Control (OAC).
 - Visitor counter: Amazon API Gateway (HTTP API, throttling) → AWS Lambda (Python, boto3) →
-  Amazon DynamoDB atomic counter, under strict IAM least-privilege policies.
+  Amazon DynamoDB atomic counter under strict IAM least-privilege policies, deduplicated per
+  browser-tab session (sessionStorage) to prevent F5 reload inflation and save Lambda
+  invocations and DynamoDB write operations.
 - This "Ask my CV" assistant: AWS Lambda (Python 3.12, arm64) calling Amazon Bedrock
   (Claude Haiku 4.5 EU cross-region inference profile) with stateless multi-turn memory and
   live FinOps telemetry.
 - CI/CD & Cost awareness: GitHub Actions deploys on every push using IAM OIDC (no
-  long-lived AWS credentials); billing alarms configured ($1.00 threshold) and everything
-  runs within AWS Free Tier limits.
+  long-lived AWS credentials), gated by an automated Quality Gate (offline unit tests with
+  unittest.mock for both Lambda handlers plus AWS SAM template validation via sam validate)
+  before building or syncing to S3; billing alarms configured ($1.00 threshold) and
+  everything runs within AWS Free Tier limits.
 - Architecture Decision Records (ADRs) & Trade-offs for this portfolio:
   * ADR 01 — Edge Delivery & Private Storage: CloudFront with Origin Access Control (OAC) +
     100% private S3 (BlockPublicAccess) instead of public S3 Static Website Hosting.

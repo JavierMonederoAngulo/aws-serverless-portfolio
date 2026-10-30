@@ -39,6 +39,16 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Run Backend Unit Tests
+        working-directory: ./backend
+        run: |
+          python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Validate SAM Template
+        working-directory: ./backend
+        run: |
+          sam validate
+
       - name: SAM Build & Deploy Backend
         working-directory: ./backend
         run: |

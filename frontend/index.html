@@ -1285,8 +1285,8 @@
                 <ul>
                     <li><strong>Private edge delivery (ADR 01)</strong> — S3 bucket with all public access blocked (<code>BlockPublicAccess</code>), served globally over HTTPS via CloudFront using Origin Access Control (OAC) instead of public S3 website hosting.</li>
                     <li><strong>In-memory GenAI context &amp; telemetry (ADR 02)</strong> — "Ask my CV" assistant loading <code>cv.txt</code> (~1,000 tokens) into Lambda RAM on Cold Start for 0&nbsp;ms Warm Start overhead (bypassing per-request S3 reads, RAG, and Haiku 4.5's 2,048-token caching minimum) with live FinOps telemetry.</li>
-                    <li><strong>Stateless sliding window &amp; atomic counter (ADR 03)</strong> — browser-managed 6-message conversation window keeping <code>/chat</code> 100% stateless without DynamoDB session storage, alongside an atomic DynamoDB visitor counter via API Gateway and Lambda.</li>
-                    <li><strong>EU cross-region inference &amp; zero-secret CI/CD (ADR 04)</strong> — invocations pinned to the EU Bedrock profile (<code>eu.anthropic.claude-haiku-4-5</code>) for GDPR data residency, deployed via AWS SAM and GitHub Actions using <strong>OpenID Connect (OIDC)</strong> temporary role assumption with zero static keys.</li>
+                    <li><strong>Stateless sliding window &amp; atomic counter (ADR 03)</strong> — browser-managed 6-message conversation window keeping <code>/chat</code> 100% stateless without DynamoDB session storage, alongside a session-deduplicated (<code>sessionStorage</code>) atomic DynamoDB visitor counter via API Gateway and Lambda.</li>
+                    <li><strong>EU cross-region inference &amp; zero-secret CI/CD (ADR 04)</strong> — invocations pinned to the EU Bedrock profile (<code>eu.anthropic.claude-haiku-4-5</code>) for GDPR data residency, deployed via AWS SAM and GitHub Actions (gated by automated unit tests and <code>sam validate</code>) using <strong>OpenID Connect (OIDC)</strong> temporary role assumption with zero static keys.</li>
                 </ul>
             </article>
 
@@ -1541,20 +1541,58 @@
     }
 
     // ====== Visitor counter (POST /visit -> {visits}) ======
+    const VISIT_STORAGE_KEY = "portfolio_visit_count";
+
+    function getCachedVisitCount() {
+        try {
+            const raw = window.sessionStorage.getItem(VISIT_STORAGE_KEY);
+            if (raw && /^[1-9]\d*$/.test(raw)) {
+                return raw;
+            }
+        } catch (_) {
+            // sessionStorage blocked or unavailable; fall back to POST /visit
+        }
+        return null;
+    }
+
+    function setCachedVisitCount(visits) {
+        try {
+            const str = String(visits);
+            if (/^[1-9]\d*$/.test(str)) {
+                window.sessionStorage.setItem(VISIT_STORAGE_KEY, str);
+            }
+        } catch (_) {
+            // sessionStorage blocked or quota exceeded; ignore silently
+        }
+    }
+
+    function renderVisitCounter(text) {
+        const footerCounter = document.getElementById("counter");
+        if (footerCounter) footerCounter.innerText = text;
+        const heroCounter = document.getElementById("hero-counter");
+        if (heroCounter) heroCounter.innerText = text;
+    }
+
     async function updateVisitCounter() {
+        const cachedVisits = getCachedVisitCount();
+        if (cachedVisits !== null) {
+            renderVisitCounter("#" + cachedVisits);
+            return;
+        }
         try {
             const response = await fetch(`${API_BASE}/visit`, { method: "POST" });
             if (response.ok) {
                 const data = await response.json();
-                const text = "#" + data.visits;
-                document.getElementById("counter").innerText = text;
-                const heroCounter = document.getElementById("hero-counter");
-                if (heroCounter) heroCounter.innerText = text;
+                const visits = Number(data && data.visits);
+                if (Number.isInteger(visits) && visits >= 1) {
+                    renderVisitCounter("#" + visits);
+                    setCachedVisitCount(visits);
+                    return;
+                }
             }
+            renderVisitCounter("N/A");
         } catch (error) {
-            document.getElementById("counter").innerText = "N/A";
-            const heroCounter = document.getElementById("hero-counter");
-            if (heroCounter) heroCounter.innerText = "N/A";
+            renderVisitCounter("N/A");
         }
     }
 
