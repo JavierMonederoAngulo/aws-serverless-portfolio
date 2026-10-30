@@ -1196,7 +1196,7 @@
                 <ul>
                     <li><strong>Private edge delivery</strong> — S3 bucket with all public access blocked, served globally over HTTPS via CloudFront using Origin Access Control (OAC).</li>
                     <li><strong>Serverless visitor counter</strong> — API Gateway routes requests to a Python Lambda function that performs atomic updates on a DynamoDB table under strict least-privilege IAM roles.</li>
-                    <li><strong>"Ask my CV" AI assistant</strong> — powered by <strong>Amazon Bedrock</strong> using the EU cross-region inference profile (<code>eu.anthropic.claude-haiku-4-5</code>) for GDPR data residency, grounded with my CV context.</li>
+                    <li><strong>"Ask my CV" AI assistant</strong> — powered by <strong>Amazon Bedrock</strong> using the EU cross-region inference profile (<code>eu.anthropic.claude-haiku-4-5</code>) for GDPR data residency, with CV context loaded into RAM on Cold Start, stateless multi-turn memory, and live FinOps telemetry.</li>
                     <li><strong>Zero-secret CI/CD pipeline</strong> — automated deployments via AWS SAM and GitHub Actions using <strong>OpenID Connect (OIDC)</strong> temporary role assumption, with zero static AWS access keys stored in GitHub.</li>
                 </ul>
             </article>
@@ -1312,7 +1312,7 @@
         <div class="sec-head">
             <div class="sec-tag">// ask my cv</div>
             <h2>Don't just read the CV. Ask it.</h2>
-            <p>A live assistant backed by Amazon Bedrock (Claude Haiku 4.5 EU profile) with my CV injected as context.</p>
+            <p>A multi-turn assistant backed by Amazon Bedrock (Claude Haiku 4.5 EU profile) with my CV loaded in RAM and live FinOps telemetry per reply.</p>
         </div>
         <div class="chat-shell reveal">
             <div class="chat-head">
