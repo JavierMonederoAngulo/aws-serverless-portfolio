@@ -701,6 +701,94 @@
             text-align: center;
             font-family: var(--mono);
         }
+        .adr-grid {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+        .adr-card {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+            transition: border-color .2s ease, background-color .2s ease;
+        }
+        .adr-card:hover {
+            border-color: var(--panel-border-strong);
+        }
+        .adr-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--hairline);
+        }
+        .adr-id {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            background: var(--accent-dim);
+            border: 1px solid rgba(255, 153, 0, 0.35);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
+        }
+        .adr-card h3 {
+            font-family: var(--display);
+            font-size: 16.5px;
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            line-height: 1.25;
+            color: var(--text);
+            text-wrap: balance;
+        }
+        .adr-body {
+            font-size: 14px;
+            color: var(--text-body);
+            line-height: 1.65;
+        }
+        .adr-body strong,
+        .adr-tradeoff strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        .adr-card code {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--blue);
+            background: var(--bg-elevated);
+            border: 1px solid var(--panel-border);
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+        .adr-tradeoff {
+            background: var(--bg-soft);
+            border: 1px solid var(--panel-border);
+            border-left: 3px solid var(--blue);
+            border-radius: var(--radius-sm);
+            padding: 11px 14px;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+        .adr-tradeoff-tag {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--blue);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-right: 6px;
+        }
 
         /* ---------- Skills ---------- */
         #skills .wrap {
@@ -1067,6 +1155,7 @@
             .metrics { grid-template-columns: repeat(2, 1fr); }
             .stage { grid-template-columns: 1fr; gap: 10px; }
             .stage .name { white-space: normal; }
+            .adr-grid { grid-template-columns: 1fr; }
             #skills .wrap { grid-template-columns: 1fr; }
             .foot-meta { flex-direction: column; align-items: flex-start; gap: 6px; }
         }
@@ -1194,10 +1283,10 @@
                     <span class="chip">Lambda (Python)</span><span class="chip">DynamoDB</span><span class="chip">Amazon Bedrock (Claude Haiku)</span><span class="chip">AWS SAM</span><span class="chip">GitHub Actions + OIDC</span>
                 </div>
                 <ul>
-                    <li><strong>Private edge delivery</strong> — S3 bucket with all public access blocked, served globally over HTTPS via CloudFront using Origin Access Control (OAC).</li>
-                    <li><strong>Serverless visitor counter</strong> — API Gateway routes requests to a Python Lambda function that performs atomic updates on a DynamoDB table under strict least-privilege IAM roles.</li>
-                    <li><strong>"Ask my CV" AI assistant</strong> — powered by <strong>Amazon Bedrock</strong> using the EU cross-region inference profile (<code>eu.anthropic.claude-haiku-4-5</code>) for GDPR data residency, with CV context loaded into RAM on Cold Start, stateless multi-turn memory, and live FinOps telemetry.</li>
-                    <li><strong>Zero-secret CI/CD pipeline</strong> — automated deployments via AWS SAM and GitHub Actions using <strong>OpenID Connect (OIDC)</strong> temporary role assumption, with zero static AWS access keys stored in GitHub.</li>
+                    <li><strong>Private edge delivery (ADR 01)</strong> — S3 bucket with all public access blocked (<code>BlockPublicAccess</code>), served globally over HTTPS via CloudFront using Origin Access Control (OAC) instead of public S3 website hosting.</li>
+                    <li><strong>In-memory GenAI context &amp; telemetry (ADR 02)</strong> — "Ask my CV" assistant loading <code>cv.txt</code> (~1,000 tokens) into Lambda RAM on Cold Start for 0&nbsp;ms Warm Start overhead (bypassing per-request S3 reads, RAG, and Haiku 4.5's 2,048-token caching minimum) with live FinOps telemetry.</li>
+                    <li><strong>Stateless sliding window &amp; atomic counter (ADR 03)</strong> — browser-managed 6-message conversation window keeping <code>/chat</code> 100% stateless without DynamoDB session storage, alongside an atomic DynamoDB visitor counter via API Gateway and Lambda.</li>
+                    <li><strong>EU cross-region inference &amp; zero-secret CI/CD (ADR 04)</strong> — invocations pinned to the EU Bedrock profile (<code>eu.anthropic.claude-haiku-4-5</code>) for GDPR data residency, deployed via AWS SAM and GitHub Actions using <strong>OpenID Connect (OIDC)</strong> temporary role assumption with zero static keys.</li>
                 </ul>
             </article>
 
@@ -1254,6 +1343,64 @@
                 <div class="name">📊 DynamoDB &nbsp;·&nbsp; 🧠 Bedrock</div>
                 <div class="desc">DynamoDB stores the live visitor count &nbsp;·&nbsp; Amazon Bedrock (<code>eu.</code> profile) processes CV questions strictly within EU regions.</div>
             </div>
+        </div>
+        <div class="adr-grid" aria-label="Architecture Decision Records">
+            <article class="adr-card reveal">
+                <div>
+                    <div class="adr-head">
+                        <span class="adr-id" translate="no">ADR 01</span>
+                        <h3>Edge Delivery &amp; Private Storage</h3>
+                    </div>
+                    <p class="adr-body">
+                        CloudFront with Origin Access Control (OAC) + 100% private S3 (<code>BlockPublicAccess</code>) instead of public S3 Static Website Hosting.
+                    </p>
+                </div>
+                <div class="adr-tradeoff">
+                    <span class="adr-tradeoff-tag">Trade-off ·</span>Requires a CloudFront cache invalidation on every CI/CD deployment, but guarantees HTTPS at the edge and eliminates any public bucket exposure.
+                </div>
+            </article>
+            <article class="adr-card reveal">
+                <div>
+                    <div class="adr-head">
+                        <span class="adr-id" translate="no">ADR 02</span>
+                        <h3>GenAI Context in Lambda RAM vs. RAG / Prompt Caching</h3>
+                    </div>
+                    <p class="adr-body">
+                        Package <code>cv.txt</code> (~1,000 tokens) and load it into RAM once during Lambda Cold Start instead of reading from S3 on every request, building a vector-DB RAG pipeline, or forcing Prompt Caching.
+                    </p>
+                </div>
+                <div class="adr-tradeoff">
+                    <span class="adr-tradeoff-tag">Trade-off ·</span>Below Claude Haiku 4.5's 2,048-token minimum caching threshold and fitting easily in the context window, Warm Start RAM loading achieves 0&nbsp;ms extra network latency and $0.00 fixed cost.
+                </div>
+            </article>
+            <article class="adr-card reveal">
+                <div>
+                    <div class="adr-head">
+                        <span class="adr-id" translate="no">ADR 03</span>
+                        <h3>Stateless Client-Side Sliding Window vs. DynamoDB Sessions</h3>
+                    </div>
+                    <p class="adr-body">
+                        The browser maintains recent conversation history and sends at most the last 6 messages to Lambda on each turn instead of persisting chat sessions in DynamoDB.
+                    </p>
+                </div>
+                <div class="adr-tradeoff">
+                    <span class="adr-tradeoff-tag">Trade-off ·</span>History resets if the visitor closes or reloads the tab, but keeps the backend 100% stateless, avoids managing session IDs, and saves database reads/writes on every turn.
+                </div>
+            </article>
+            <article class="adr-card reveal">
+                <div>
+                    <div class="adr-head">
+                        <span class="adr-id" translate="no">ADR 04</span>
+                        <h3>EU Cross-Region Inference &amp; Zero-Secret OIDC CI/CD</h3>
+                    </div>
+                    <p class="adr-body">
+                        Invoke Amazon Bedrock via the European profile (<code>eu.anthropic.claude-haiku-4-5</code>) and deploy with GitHub Actions using IAM OIDC federation instead of static <code>AWS_ACCESS_KEY_ID</code> keys.
+                    </p>
+                </div>
+                <div class="adr-tradeoff">
+                    <span class="adr-tradeoff-tag">Trade-off ·</span>Stricter initial configuration of IAM policies and OIDC permissions, in exchange for guaranteed EU data residency (GDPR) and zero long-lived credentials stored in GitHub.
+                </div>
+            </article>
         </div>
         <p class="arch-note">CI/CD via GitHub Actions + AWS IAM OIDC · Infrastructure defined in AWS SAM · Cost-controlled within Free Tier</p>
     </div>

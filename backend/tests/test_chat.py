@@ -444,6 +444,10 @@ class TestChatHandler(unittest.TestCase):
         self.assertIn("1,000 tokens", cv_lower)
         self.assertIn("2,048", cv_lower)
         self.assertIn("prompt caching", cv_lower)
+        self.assertIn("adr 01", cv_lower)
+        self.assertIn("adr 02", cv_lower)
+        self.assertIn("adr 03", cv_lower)
+        self.assertIn("adr 04", cv_lower)
         self.assertNotIn("injected\n  from s3", cv_lower)
 
 

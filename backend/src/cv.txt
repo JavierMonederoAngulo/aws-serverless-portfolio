@@ -42,21 +42,43 @@ Docker on Ubuntu Server, integrating Microsoft Graph API (Outlook) and Google Ge
   repository README.
 
 === PROJECT 2 — THIS WEBSITE (SERVERLESS CLOUD PORTFOLIO ON AWS) ===
-The site you are using right now. Architecture:
-- Static frontend on Amazon S3 with public access blocked, delivered globally over HTTPS via
-  Amazon CloudFront with Origin Access Control (OAC).
+Public repo: github.com/JavierMonederoAngulo/aws-serverless-portfolio
+The site you are using right now. Architecture & components:
+- Static frontend on Amazon S3 with public access blocked (BlockPublicAccess), delivered
+  globally over HTTPS via Amazon CloudFront with Origin Access Control (OAC).
 - Visitor counter: Amazon API Gateway (HTTP API, throttling) → AWS Lambda (Python, boto3) →
   Amazon DynamoDB atomic counter, under strict IAM least-privilege policies.
 - This "Ask my CV" assistant: AWS Lambda (Python 3.12, arm64) calling Amazon Bedrock
   (Claude Haiku 4.5 EU cross-region inference profile) with stateless multi-turn memory and
-  live FinOps telemetry. My CV context (cv.txt) is packaged with the function and loaded
-  once into RAM during the Lambda Cold Start (reused across Warm Starts rather than reading
-  from S3 on every request). I deliberately omitted both RAG/vector databases and Prompt
-  Caching because the entire CV corpus (~1,000 tokens) fits comfortably in the context
-  window and is below the 2,048-token minimum threshold required by Claude Haiku 4.5 for
-  prompt caching; I would move to Amazon Bedrock Knowledge Bases if the document set grew.
-- CI/CD: GitHub Actions deploys on every push using OIDC — no long-lived AWS credentials.
-- Cost awareness: billing alarms configured; everything runs within AWS Free Tier limits.
+  live FinOps telemetry.
+- CI/CD & Cost awareness: GitHub Actions deploys on every push using IAM OIDC (no
+  long-lived AWS credentials); billing alarms configured ($1.00 threshold) and everything
+  runs within AWS Free Tier limits.
+- Architecture Decision Records (ADRs) & Trade-offs for this portfolio:
+  * ADR 01 — Edge Delivery & Private Storage: CloudFront with Origin Access Control (OAC) +
+    100% private S3 (BlockPublicAccess) instead of public S3 Static Website Hosting.
+    Trade-off: requires a CloudFront cache invalidation on every CI/CD deployment, but
+    guarantees HTTPS at the edge and eliminates any public bucket exposure.
+  * ADR 02 — GenAI Context in Lambda RAM vs. RAG / Prompt Caching: package cv.txt
+    (~1,000 tokens) with the function and load it into RAM once during the Lambda Cold Start
+    (reused across Warm Starts) instead of reading from S3 on every request, building a
+    RAG vector database, or forcing Prompt Caching. Trade-off: because the corpus is below
+    the 2,048-token minimum threshold required by Claude Haiku 4.5 for prompt caching and
+    fits comfortably in the context window, Warm Start RAM loading achieves 0 ms extra
+    network latency and $0.00 fixed cost (I would move to Amazon Bedrock Knowledge Bases
+    if the document set grew).
+  * ADR 03 — Stateless Client-Side Sliding Window vs. DynamoDB Sessions: the browser holds
+    recent conversation history and sends at most the last 6 messages (3 turns) to Lambda
+    on each turn instead of persisting chat sessions in DynamoDB. Trade-off: conversation
+    history resets if the visitor closes or reloads the tab, but keeps the backend 100%
+    stateless, avoids managing session IDs, and saves database read/write operations on
+    every turn.
+  * ADR 04 — EU Cross-Region Inference & Zero-Secret OIDC CI/CD: invoke Amazon Bedrock via
+    the European inference profile (eu.anthropic.claude-haiku-4-5) and deploy with GitHub
+    Actions using IAM OIDC federation instead of static AWS_ACCESS_KEY_ID credentials.
+    Trade-off: stricter initial configuration of IAM policies and OIDC permissions, in
+    exchange for guaranteed EU data residency (GDPR) and zero long-lived credentials
+    stored in GitHub.
 
 === PROJECT 3 — SELF-HOSTED REMOTE GAMING HOMELAB ===
 Running 24/7 for real users (my family): a Raspberry Pi with Ubuntu Server as an always-on

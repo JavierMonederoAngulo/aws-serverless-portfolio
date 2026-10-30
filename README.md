@@ -17,6 +17,17 @@ A 100% serverless personal portfolio and interactive AI assistant built on **AWS
    - `/visit`: Performs atomic counter updates in **Amazon DynamoDB**.
    - `/chat`: Validates input & conversation bounds, injects CV context from RAM (loaded once during Lambda Cold Start) alongside stateless multi-turn history (up to 3 prior turns / 6 messages), invokes **Amazon Bedrock** (`eu.anthropic.claude-haiku-4-5`) via an EU Cross-Region Inference profile, and returns live execution & FinOps telemetry (`cold_start`, `latency_ms`, `input_tokens`, `output_tokens`, `estimated_cost_usd`).
 
+### Architecture Decision Records (ADRs)
+
+* **ADR 01 · Edge Delivery & Private Storage:** **CloudFront** with **Origin Access Control (OAC)** + 100% private **S3** (`BlockPublicAccess`) instead of public S3 Static Website Hosting.
+  * *Trade-off:* Requires a CloudFront cache invalidation on every CI/CD deployment, but guarantees HTTPS at the edge and eliminates any public bucket exposure.
+* **ADR 02 · GenAI Context in Lambda RAM vs. RAG / Prompt Caching:** Package `cv.txt` (~1,000 tokens) and load it into RAM once during Lambda **Cold Start** instead of reading from S3 on every request, building a vector-DB RAG pipeline, or forcing Prompt Caching.
+  * *Trade-off:* Below Claude Haiku 4.5's 2,048-token minimum caching threshold and fitting easily in the context window, Warm Start RAM loading achieves `0 ms` extra network latency and `$0.00` fixed cost.
+* **ADR 03 · Stateless Client-Side Sliding Window vs. DynamoDB Sessions:** The browser maintains recent conversation history and sends at most the last 6 messages to Lambda on each turn instead of persisting chat sessions in **DynamoDB**.
+  * *Trade-off:* History resets if the visitor closes or reloads the tab, but keeps the backend 100% stateless, avoids managing session IDs, and saves database read/write operations on every turn.
+* **ADR 04 · EU Cross-Region Inference & Zero-Secret OIDC CI/CD:** Invoke **Amazon Bedrock** via the European profile (`eu.anthropic.claude-haiku-4-5`) and deploy with **GitHub Actions** using **IAM OIDC** federation instead of static `AWS_ACCESS_KEY_ID` keys.
+  * *Trade-off:* Stricter initial configuration of IAM policies and OIDC permissions, in exchange for guaranteed EU data residency (GDPR) and zero long-lived credentials stored in GitHub.
+
 ---
 
 ## 🛡️ AWS Well-Architected Highlights
